@@ -12,6 +12,9 @@ authors = [
   "Alejandro Avilés <ome@unconventional.dev>"
 ]
 
+[tool.poetry.scripts]
+unbeheader = "unbeheader.cli:main"
+
 [tool.poetry.dependencies]
 python = ">=3.9.0"
 colorclass = ">=2.2.2"
