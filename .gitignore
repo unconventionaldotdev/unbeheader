@@ -1,0 +1,7 @@
+# dependencies
+.venv/
+
+# temporary directories
+.pytest_cache/
+.ruff_cache/
+__pycache__/

@@ -1,0 +1,27 @@
+[virtualenvs]
+create = true
+in-project = true
+
+[tool.poetry]
+name = "unbeheader"
+version = "0.1.0"
+description = "Never fail to maintain your file headers."
+readme = "README.md"
+authors = [
+  "Adrian Moennich <adrian.moennich@cern.ch>",
+  "Alejandro Avilés <ome@unconventional.dev>"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.9.0"
+colorclass = ">=2.2.2"
+pyyaml = ">=6.0.1"
+click = ">=8.1.6"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+ruff = "^0.0.280"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
