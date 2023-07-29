@@ -6,8 +6,8 @@ from datetime import date
 
 import click
 
+from .config import get_config
 from .util import cformat
-from .util import get_config
 from .util import is_blacklisted
 
 # Dictionary listing the files for which to change the header.
@@ -43,9 +43,6 @@ SUPPORTED_FILES = {
         'format': {'comment_start': '#', 'comment_middle': '#', 'comment_end': ''}},
 }
 
-# The substring which must be part of a comment block in order for the comment to be updated by the header.
-SUBSTRING = 'This file is part of'
-
 USAGE = '''
 Updates all the headers in the supported files ({supported_files}).
 By default, all the files tracked by git in the current repository are updated
@@ -67,7 +64,7 @@ def gen_header(data):
     return f'{comment}\n'
 
 
-def _update_header(file_path, config, substring, regex, data, ci):
+def _update_header(file_path, config, regex, data, ci):
     found = False
     with open(file_path) as file_read:
         content = orig_content = file_read.read()
@@ -77,7 +74,7 @@ def _update_header(file_path, config, substring, regex, data, ci):
         if content.startswith('#!/'):
             shebang_line, content = content.split('\n', 1)
         for match in regex.finditer(content):
-            if substring in match.group():
+            if config['substring'] in match.group():
                 found = True
                 match_end = content[match.end():].lstrip()
                 match_end = f'\n{match_end}' if match_end else match_end
@@ -108,7 +105,7 @@ def update_header(file_path, year, ci):
         return False
     if os.path.basename(file_path)[0] == '.':
         return False
-    return _update_header(file_path, config, SUBSTRING, SUPPORTED_FILES[ext]['regex'],
+    return _update_header(file_path, config, SUPPORTED_FILES[ext]['regex'],
                           SUPPORTED_FILES[ext]['format'], ci)
 
 
