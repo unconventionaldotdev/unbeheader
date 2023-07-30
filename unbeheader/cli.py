@@ -1,47 +1,14 @@
 import os
-import re
 import subprocess
 import sys
 from datetime import date
 
 import click
 
-from .config import get_config
+from . import SUPPORTED_FILES
+from .headers import update_header
 from .util import cformat
 from .util import is_blacklisted
-
-# Dictionary listing the files for which to change the header.
-# The key is the extension of the file (without the dot) and the value is another
-# dictionary containing two keys:
-#   - 'regex' : A regular expression matching comments in the given file type
-#   - 'format': A dictionary with the comment characters to add to the header.
-#               There must be a `comment_start` inserted before the header,
-#               `comment_middle` inserted at the beginning of each line except the
-#               first and last one, and `comment_end` inserted at the end of the
-#               header. (See the `HEADER` above)
-SUPPORTED_FILES = {
-    'py': {
-        'regex': re.compile(r'((^#|[\r\n]#).*)*'),
-        'format': {'comment_start': '#', 'comment_middle': '#', 'comment_end': ''}},
-    'wsgi': {
-        'regex': re.compile(r'((^#|[\r\n]#).*)*'),
-        'format': {'comment_start': '#', 'comment_middle': '#', 'comment_end': ''}},
-    'js': {
-        'regex': re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
-        'format': {'comment_start': '//', 'comment_middle': '//', 'comment_end': ''}},
-    'jsx': {
-        'regex': re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
-        'format': {'comment_start': '//', 'comment_middle': '//', 'comment_end': ''}},
-    'css': {
-        'regex': re.compile(r'/\*(.|[\r\n])*?\*/'),
-        'format': {'comment_start': '/*', 'comment_middle': ' *', 'comment_end': ' */'}},
-    'scss': {
-        'regex': re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
-        'format': {'comment_start': '//', 'comment_middle': '//', 'comment_end': ''}},
-    'sh': {
-        'regex': re.compile(r'((^#|[\r\n]#).*)*'),
-        'format': {'comment_start': '#', 'comment_middle': '#', 'comment_end': ''}},
-}
 
 USAGE = '''
 Updates all the headers in the supported files ({supported_files}).
@@ -53,60 +20,6 @@ This will update all the supported files in the scope including those not tracke
 by git. If the directory does not contain any supported files (or if the file
 specified is not supported) nothing will be updated.
 '''.format(supported_files=', '.join(SUPPORTED_FILES)).strip()
-
-
-def gen_header(data):
-    if data['start_year'] == data['end_year']:
-        data['dates'] = data['start_year']
-    else:
-        data['dates'] = '{} - {}'.format(data['start_year'], data['end_year'])
-    comment = '\n'.join(line.rstrip() for line in data['header'].format(**data).strip().splitlines())
-    return f'{comment}\n'
-
-
-def _update_header(file_path, config, regex, data, ci):
-    found = False
-    with open(file_path) as file_read:
-        content = orig_content = file_read.read()
-        if not content.strip():
-            return False
-        shebang_line = None
-        if content.startswith('#!/'):
-            shebang_line, content = content.split('\n', 1)
-        for match in regex.finditer(content):
-            if config['substring'] in match.group():
-                found = True
-                match_end = content[match.end():].lstrip()
-                match_end = f'\n{match_end}' if match_end else match_end
-                if not content[:match.start()].strip() and not match_end.strip():
-                    # file is otherwise empty, we do not want a header in there
-                    content = ''
-                else:
-                    content = content[:match.start()] + gen_header(data | config) + match_end
-        if shebang_line:
-            content = shebang_line + '\n' + content
-    if content != orig_content:
-        msg = 'Incorrect header in {}' if ci else cformat('%{green!}Updating header of %{blue!}{}')
-        print(msg.format(os.path.relpath(file_path)))
-        if not ci:
-            with open(file_path, 'w') as file_write:
-                file_write.write(content)
-        return True
-    elif not found:
-        msg = 'Missing header in {}' if ci else cformat('%{red!}Missing header%{reset} in %{blue!}{}')
-        print(msg.format(os.path.relpath(file_path)))
-        return True
-
-
-def update_header(file_path, year, ci):
-    config = get_config(file_path, year)
-    ext = file_path.rsplit('.', 1)[-1]
-    if ext not in SUPPORTED_FILES or not os.path.isfile(file_path):
-        return False
-    if os.path.basename(file_path)[0] == '.':
-        return False
-    return _update_header(file_path, config, SUPPORTED_FILES[ext]['regex'],
-                          SUPPORTED_FILES[ext]['format'], ci)
 
 
 @click.command(help=USAGE)
