@@ -8,7 +8,7 @@ import click
 from . import SUPPORTED_FILES
 from .headers import update_header
 from .util import cformat
-from .util import is_blacklisted
+from .util import is_excluded
 
 USAGE = '''
 Updates all the headers in the supported files ({supported_files}).
@@ -38,7 +38,7 @@ def main(ctx, ci, year, path):
                           '%{yellow!}{path}%{reset}...').format(year=year, path=path))
         for root, _, filenames in os.walk(path):
             for filename in filenames:
-                if not is_blacklisted(path, root):
+                if not is_excluded(root, path):
                     if update_header(os.path.join(root, filename), year, ci):
                         error = True
     elif path and os.path.isfile(path):
@@ -54,7 +54,7 @@ def main(ctx, ci, year, path):
         try:
             for filepath in subprocess.check_output(['git', 'ls-files'], text=True).splitlines():
                 filepath = os.path.abspath(filepath)
-                if not is_blacklisted(os.getcwd(), os.path.dirname(filepath)):
+                if not is_excluded(os.path.dirname(filepath), os.getcwd()):
                     if update_header(filepath, year, ci):
                         error = True
         except subprocess.CalledProcessError:
