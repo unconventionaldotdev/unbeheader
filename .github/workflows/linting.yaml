@@ -1,0 +1,50 @@
+name: linting
+
+on:
+  push:
+    branches:
+      - devel
+      - master
+  pull_request:
+    branches:
+      - devel
+      - master
+
+jobs:
+  setup:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: |
+          pipx install poetry
+      - name: Set up Python
+        id: python
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/setup-python@v4
+        with:
+          cache: 'poetry'
+      - name: Install dependencies
+        if: steps.python.outputs.cache-hit != 'true'
+        run: |
+          poetry install --no-root
+
+  lint:
+    needs: setup
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: |
+          pipx install poetry
+      - name: Set up Python
+        id: python
+        uses: actions/setup-python@v4
+        with:
+          cache: 'poetry'
+      - name: Install dependencies
+        run: |
+          poetry install --no-root
+      - name: Run tests
+        run: |
+          poetry run -- make lint
