@@ -1,3 +1,6 @@
+# This file is part of Unbeheader.
+# Copyright (C) CERN & UNCONVENTIONAL
+
 import re
 
 # Dictionary listing the files for which to change the header.

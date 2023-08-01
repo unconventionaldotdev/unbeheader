@@ -1,3 +1,6 @@
+# This file is part of Unbeheader.
+# Copyright (C) CERN & UNCONVENTIONAL
+
 import subprocess
 import sys
 from datetime import date

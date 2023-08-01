@@ -1,3 +1,6 @@
+# This file is part of Unbeheader.
+# Copyright (C) CERN & UNCONVENTIONAL
+
 import pytest
 from colorclass import Color
 

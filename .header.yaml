@@ -1,0 +1,6 @@
+root: true
+owner: CERN & UNCONVENTIONAL
+header: |-
+  {comment_start} This file is part of Unbeheader.
+  {comment_middle} Copyright (C) {owner}
+  {comment_end}

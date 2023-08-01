@@ -1,3 +1,6 @@
+# This file is part of Unbeheader.
+# Copyright (C) CERN & UNCONVENTIONAL
+
 import os
 from datetime import date
 from unittest import mock

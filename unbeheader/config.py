@@ -1,3 +1,6 @@
+# This file is part of Unbeheader.
+# Copyright (C) CERN & UNCONVENTIONAL
+
 import sys
 from collections.abc import Iterator
 from pathlib import Path

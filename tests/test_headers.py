@@ -1,3 +1,6 @@
+# This file is part of Unbeheader.
+# Copyright (C) CERN & UNCONVENTIONAL
+
 from datetime import date
 from textwrap import dedent
 from unittest import mock
