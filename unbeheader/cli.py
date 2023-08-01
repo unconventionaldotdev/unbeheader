@@ -4,6 +4,7 @@ import sys
 from datetime import date
 
 import click
+from click import UsageError
 
 from . import SUPPORTED_FILES
 from .headers import update_header
@@ -29,38 +30,13 @@ specified is not supported) nothing will be updated.
 @click.option('--year', '-y', type=click.IntRange(min=1000), default=date.today().year, metavar='YEAR',
               help='Indicate the target year')
 @click.option('--path', '-p', type=click.Path(exists=True), help='Restrict updates to a specific file or directory')
-@click.pass_context
-def main(ctx, ci, year, path):
-    error = False
+def main(ci, year, path):
     if path and os.path.isdir(path):
-        if not ci:
-            print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for all the files in '
-                          '%{yellow!}{path}%{reset}...').format(year=year, path=path))
-        for root, _, filenames in os.walk(path):
-            for filename in filenames:
-                if not is_excluded(root, path):
-                    if update_header(os.path.join(root, filename), year, ci):
-                        error = True
+        error = _run_on_directory(path, year, ci)
     elif path and os.path.isfile(path):
-        if not ci:
-            print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for the file '
-                          '%{yellow!}{file}%{reset}...').format(year=year, file=path))
-        if update_header(path, year, ci):
-            error = True
+        error = _run_on_file(path, year, ci)
     else:
-        if not ci:
-            print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for all '
-                          'git-tracked files...').format(year=year))
-        try:
-            for filepath in subprocess.check_output(['git', 'ls-files'], text=True).splitlines():
-                filepath = os.path.abspath(filepath)
-                if not is_excluded(os.path.dirname(filepath), os.getcwd()):
-                    if update_header(filepath, year, ci):
-                        error = True
-        except subprocess.CalledProcessError:
-            raise click.UsageError(
-                click.style('You must be within a git repository to run this script.', fg='red', bold=True))
-
+        error = _run_on_repo(year, ci)
     if not error:
         click.secho('\u2705 All headers are up to date', fg='green')
     elif ci:
@@ -68,6 +44,45 @@ def main(ctx, ci, year, path):
         sys.exit(1)
     else:
         click.secho('\U0001F504 Some headers have been updated (or are missing)', fg='yellow')
+
+
+def _run_on_directory(path: str, year: int, ci: bool) -> bool:
+    error = False
+    if not ci:
+        print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for all the files in '
+                      '%{yellow!}{path}%{reset}...').format(year=year, path=path))
+    for root, _, filenames in os.walk(path):
+        for filename in filenames:
+            if not is_excluded(root, path):
+                if update_header(os.path.join(root, filename), year, ci):
+                    error = True
+    return error
+
+def _run_on_file(path: str, year: int, ci: bool) -> bool:
+    error = False
+    if not ci:
+        print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for the file '
+                      '%{yellow!}{file}%{reset}...').format(year=year, file=path))
+    if update_header(path, year, ci):
+        error = True
+    return error
+
+
+def _run_on_repo(year: int, ci: bool) -> bool:
+    error = False
+    if not ci:
+        print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for all '
+                      'git-tracked files...').format(year=year))
+    try:
+        for filepath in subprocess.check_output(['git', 'ls-files'], text=True).splitlines():
+            filepath = os.path.abspath(filepath)
+            if not is_excluded(os.path.dirname(filepath), os.getcwd()):
+                if update_header(filepath, year, ci):
+                    error = True
+    except subprocess.CalledProcessError as e:
+        msg = click.style('You must be within a git repository to run this script.', fg='red', bold=True)
+        raise UsageError(msg) from e
+    return error
 
 
 if __name__ == '__main__':
