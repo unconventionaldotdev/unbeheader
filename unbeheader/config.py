@@ -1,6 +1,6 @@
-import os
 import sys
 from collections.abc import Iterator
+from pathlib import Path
 
 import click
 import yaml
@@ -12,7 +12,7 @@ DEFAULT_SUBSTRING = 'This file is part of'
 CONFIG_FILE_NAME = '.header.yaml'
 
 
-def get_config(path: str, end_year: int) -> dict:
+def get_config(path: Path, end_year: int) -> dict:
     """Get configuration from headers files."""
     config = _load_config(path)
     _validate_config(config)
@@ -21,15 +21,14 @@ def get_config(path: str, end_year: int) -> dict:
     return config
 
 
-def _load_config(path: str) -> dict:
+def _load_config(path: Path) -> dict:
     config = {}
     found = False
-    for dirname in _walk_to_root(path):
-        check_path = os.path.join(dirname, CONFIG_FILE_NAME)
-        if os.path.isfile(check_path):
+    for dir_path in _walk_to_root(path):
+        check_path = dir_path / CONFIG_FILE_NAME
+        if check_path.is_file():
             found = True
-            with open(check_path) as f:
-                config.update((k, v) for k, v in yaml.safe_load(f.read()).items() if k not in config)
+            config.update((k, v) for k, v in yaml.safe_load(check_path.read_text()).items() if k not in config)
             if config.pop('root', False):
                 break
     if not found:
@@ -52,20 +51,11 @@ def _validate_config(config: dict):
         sys.exit(1)
 
 
-def _walk_to_root(path: str) -> Iterator[str]:
+def _walk_to_root(path: Path) -> Iterator[Path]:
     """Yield directories starting from the given directory up to the root."""
-    # Based on code from python-dotenv (BSD-licensed):
-    # https://github.com/theskumar/python-dotenv/blob/3ffcef60/src/dotenv/main.py#L252
-
-    if not os.path.exists(path):
+    if not path.exists():
         raise OSError('Starting path not found')
-
-    if os.path.isfile(path):
-        path = os.path.dirname(path)
-
-    last_dir = None
-    current_dir = os.path.abspath(path)
-    while last_dir != current_dir:
-        yield current_dir
-        parent_dir = os.path.abspath(os.path.join(current_dir, os.path.pardir))
-        last_dir, current_dir = current_dir, parent_dir
+    if path.is_file():
+        path = path.parent
+    yield path
+    yield from path.parents

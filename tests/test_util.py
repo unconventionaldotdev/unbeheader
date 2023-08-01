@@ -20,10 +20,10 @@ def test_cformat(string, expected):
 
 
 def test_is_excluded(tmp_path):
-    assert is_excluded(str(tmp_path), str(tmp_path)) is False
+    assert is_excluded(tmp_path, tmp_path) is False
     file_path = tmp_path / EXCLUDE_FILE_NAME
     file_path.touch()
-    assert is_excluded(str(tmp_path), str(tmp_path)) is True
+    assert is_excluded(tmp_path, tmp_path) is True
 
 
 def test_is_excluded_for_nested(tmp_path):
@@ -31,4 +31,4 @@ def test_is_excluded_for_nested(tmp_path):
     nested_dir_path.mkdir()
     file_path = tmp_path / EXCLUDE_FILE_NAME
     file_path.touch()
-    assert is_excluded(str(nested_dir_path), str(tmp_path)) is True
+    assert is_excluded(nested_dir_path, tmp_path) is True

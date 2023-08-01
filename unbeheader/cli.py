@@ -1,7 +1,7 @@
-import os
 import subprocess
 import sys
 from datetime import date
+from pathlib import Path
 
 import click
 from click import UsageError
@@ -30,10 +30,11 @@ specified is not supported) nothing will be updated.
 @click.option('--year', '-y', type=click.IntRange(min=1000), default=date.today().year, metavar='YEAR',
               help='Indicate the target year')
 @click.option('--path', '-p', type=click.Path(exists=True), help='Restrict updates to a specific file or directory')
-def main(ci, year, path):
-    if path and os.path.isdir(path):
+def main(ci: bool, year: int, path: str):
+    path = Path(path).resolve() if path else None
+    if path and path.is_dir():
         error = _run_on_directory(path, year, ci)
-    elif path and os.path.isfile(path):
+    elif path and path.is_file():
         error = _run_on_file(path, year, ci)
     else:
         error = _run_on_repo(year, ci)
@@ -46,19 +47,21 @@ def main(ci, year, path):
         click.secho('\U0001F504 Some headers have been updated (or are missing)', fg='yellow')
 
 
-def _run_on_directory(path: str, year: int, ci: bool) -> bool:
+def _run_on_directory(path: Path, year: int, ci: bool) -> bool:
     error = False
     if not ci:
         print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for all the files in '
                       '%{yellow!}{path}%{reset}...').format(year=year, path=path))
-    for root, _, filenames in os.walk(path):
-        for filename in filenames:
-            if not is_excluded(root, path):
-                if update_header(os.path.join(root, filename), year, ci):
-                    error = True
+    root_path = path
+    for path in root_path.glob('**/*'):
+        if path.is_dir():
+            continue
+        if not is_excluded(path, root_path):
+            if update_header(path, year, ci):
+                error = True
     return error
 
-def _run_on_file(path: str, year: int, ci: bool) -> bool:
+def _run_on_file(path: Path, year: int, ci: bool) -> bool:
     error = False
     if not ci:
         print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for the file '
@@ -74,10 +77,10 @@ def _run_on_repo(year: int, ci: bool) -> bool:
         print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for all '
                       'git-tracked files...').format(year=year))
     try:
-        for filepath in subprocess.check_output(['git', 'ls-files'], text=True).splitlines():
-            filepath = os.path.abspath(filepath)
-            if not is_excluded(os.path.dirname(filepath), os.getcwd()):
-                if update_header(filepath, year, ci):
+        for file_path in subprocess.check_output(['git', 'ls-files'], text=True).splitlines():
+            file_path = Path(file_path).absolute()
+            if not is_excluded(file_path.parent, Path.cwd()):
+                if update_header(file_path, year, ci):
                     error = True
     except subprocess.CalledProcessError as e:
         msg = click.style('You must be within a git repository to run this script.', fg='red', bold=True)

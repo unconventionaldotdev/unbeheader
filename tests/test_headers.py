@@ -53,9 +53,9 @@ def test_update_header(_do_update_header, get_config, create_py_file):
     ci = True
     file_path = create_py_file('')
     file_ext = file_path.suffix[1:]
-    update_header(str(file_path), year, ci)
+    update_header(file_path, year, ci)
     _do_update_header.assert_called_once_with(
-        str(file_path), config, SUPPORTED_FILES[file_ext]['regex'], SUPPORTED_FILES[file_ext]['comments'], ci
+        file_path, config, SUPPORTED_FILES[file_ext]['regex'], SUPPORTED_FILES[file_ext]['comments'], ci
     )
 
 
@@ -64,7 +64,7 @@ def test_update_header(_do_update_header, get_config, create_py_file):
 def test_update_header_for_non_existent_file(_do_update_header, get_config, tmp_path):
     year = date.today().year
     file_path = tmp_path / 'manuscript.py'
-    assert update_header(str(file_path), year) is False
+    assert update_header(file_path, year) is False
     assert _do_update_header.call_count == 0
 
 
@@ -75,7 +75,7 @@ def test_update_header_for_unsupported_file(_do_update_header, get_config, tmp_p
     file_path = tmp_path / 'manuscript.txt'
     file_path.touch()
     assert 'txt' not in SUPPORTED_FILES
-    assert update_header(str(file_path), year) is False
+    assert update_header(file_path, year) is False
     assert _do_update_header.call_count == 0
 
 
@@ -84,7 +84,7 @@ def test_update_header_for_unsupported_file(_do_update_header, get_config, tmp_p
 def test_update_header_for_current_dir(_do_update_header, get_config, tmp_path):
     year = date.today().year
     file_path = tmp_path / '.'
-    assert update_header(str(file_path), year) is False
+    assert update_header(file_path, year) is False
     assert _do_update_header.call_count == 0
 
 

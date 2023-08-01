@@ -1,5 +1,6 @@
 import os
 from datetime import date
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -107,20 +108,20 @@ def test_validate_config_for_missing_keys():
 
 def test_walk_to_root_for_non_existent_path():
     with pytest.raises(OSError):
-        list(_walk_to_root('/path/to/nowhere'))
+        list(_walk_to_root(Path('/path/to/nowhere')))
 
 
 def test_walk_to_root_for_file_path(tmp_path):
     file_path = tmp_path / 'manuscript.py'
     file_path.touch()
-    assert list(_walk_to_root(file_path)) == [str(p) for p in file_path.parents]
+    assert list(_walk_to_root(file_path)) == list(file_path.parents)
 
 
 def test_walk_to_root_for_directory(tmp_path):
-    assert list(_walk_to_root(tmp_path)) == [str(tmp_path)] + [str(p) for p in tmp_path.parents]
+    assert list(_walk_to_root(tmp_path)) == [tmp_path] + list(tmp_path.parents)
 
 
 def test_walk_to_root_for_root_directory():
-    root_dir = '/'
-    expected_dirs = [root_dir]
-    assert list(_walk_to_root(root_dir)) == expected_dirs
+    root_path = Path('/')
+    expected_dirs = [root_path]
+    assert list(_walk_to_root(root_path)) == expected_dirs

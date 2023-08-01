@@ -1,5 +1,5 @@
-import os
 import re
+from pathlib import Path
 
 from colorclass import Color
 
@@ -29,7 +29,7 @@ def cformat(string: str) -> Color:
     return Color(string)
 
 
-def is_excluded(path: str, root_path: str = None, cache: dict = None) -> bool:
+def is_excluded(path: Path, root_path: Path = None, cache: dict = None) -> bool:
     """"Whether the path is excluded by a .no-headers file.
 
     The .no-headers file is searched for in the path and all parents up to the root.
@@ -43,9 +43,9 @@ def is_excluded(path: str, root_path: str = None, cache: dict = None) -> bool:
     orig_path = path
     if path not in cache:
         cache[orig_path] = False
-        while (path + os.path.sep).startswith(root_path):
-            if os.path.exists(os.path.join(path, EXCLUDE_FILE_NAME)):
+        while str(path).startswith(str(root_path)):
+            if (path / EXCLUDE_FILE_NAME).exists():
                 cache[orig_path] = True
                 break
-            path = os.path.normpath(os.path.join(path, '..'))
+            path = path.parent
     return cache[orig_path]
