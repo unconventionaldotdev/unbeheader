@@ -235,3 +235,14 @@ def test_generate_header_for_different_end_year(config):
         # This file is part of Thelema.
         # Copyright (C) 1904 - {end_year} Ordo Templi Orientis
     '''.format(end_year)).lstrip()
+
+
+@pytest.mark.parametrize('template', (
+    '{root}', '{template}', '{substring}'
+))
+def test_generate_header_for_invalid_placeholder(template, config):
+    data = SUPPORTED_FILES['py']['comments'] | config
+    data['template'] = template
+    with pytest.raises(SystemExit) as exc:
+        _generate_header(data)
+    assert exc.value.code == 1

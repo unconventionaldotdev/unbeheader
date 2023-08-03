@@ -2,8 +2,11 @@
 # Copyright (C) CERN & UNCONVENTIONAL
 
 import os
+import sys
 from pathlib import Path
 from re import Pattern
+
+import click
 
 from . import SUPPORTED_FILES
 from .config import get_config
@@ -28,7 +31,12 @@ def _generate_header(data: dict) -> str:
         data['dates'] = data['start_year']
     else:
         data['dates'] = '{} - {}'.format(data['start_year'], data['end_year'])
-    comment = '\n'.join(line.rstrip() for line in data['template'].format(**data).strip().splitlines())
+    template_data = {k: v for k, v in data.items() if k not in {'root', 'substring', 'template'}}
+    try:
+        comment = '\n'.join(line.rstrip() for line in data['template'].format(**template_data).strip().splitlines())
+    except KeyError as e:
+        click.secho(f'Invalid placeholder {{{e.args[0]}}} found in template', fg='red', err=True)
+        sys.exit(1)
     return f'{comment}\n'
 
 
