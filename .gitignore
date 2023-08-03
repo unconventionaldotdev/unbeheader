@@ -1,6 +1,9 @@
 # dependencies
 .venv/
 
+# packaging
+dist/
+
 # temporary directories
 .pytest_cache/
 .ruff_cache/

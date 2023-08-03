@@ -1,0 +1,75 @@
+name: releasing
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  tag:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Prepare Git environment
+        run: |
+          git fetch origin 'refs/tags/*:refs/tags/*'
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+      - name: Create tag
+        run: |
+          bin/tag.sh
+      - name: Publish tag
+        if: github.event_name != 'pull_request'
+        run: |
+          git push --tags
+
+  setup:
+    needs: tag
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: |
+          pipx install poetry
+      - name: Set up Python
+        id: python
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/setup-python@v4
+        with:
+          cache: 'poetry'
+      - name: Install dependencies
+        if: steps.python.outputs.cache-hit != 'true'
+        run: |
+          poetry install --no-root
+
+  release:
+    needs: setup
+    runs-on: ubuntu-22.04
+    if: github.event_name != 'pull_request'
+    environment:
+      name: release
+      url: https://pypi.org/project/unbeheader/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: |
+          pipx install poetry
+      - name: Set up Python
+        id: python
+        uses: actions/setup-python@v4
+        with:
+          cache: 'poetry'
+      - name: Install package
+        run: |
+          poetry install
+      - name: Build package
+        run: |
+          poetry build
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
