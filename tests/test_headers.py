@@ -21,7 +21,7 @@ def config():
         'start_year': 1904,
         'end_year': 1904,
         'substring': DEFAULT_SUBSTRING,
-        'header': dedent('''
+        'template': dedent('''
             {comment_start} This file is part of Thelema.
             {comment_middle} Copyright (C) {dates} {owner}
             {comment_end}

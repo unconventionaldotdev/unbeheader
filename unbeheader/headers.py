@@ -28,7 +28,7 @@ def _generate_header(data: dict) -> str:
         data['dates'] = data['start_year']
     else:
         data['dates'] = '{} - {}'.format(data['start_year'], data['end_year'])
-    comment = '\n'.join(line.rstrip() for line in data['header'].format(**data).strip().splitlines())
+    comment = '\n'.join(line.rstrip() for line in data['template'].format(**data).strip().splitlines())
     return f'{comment}\n'
 
 

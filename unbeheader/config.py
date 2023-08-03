@@ -41,8 +41,8 @@ def _load_config(path: Path) -> dict:
 
 
 def _validate_config(config: dict):
-    valid_keys = {'owner', 'start_year', 'substring', 'header'}
-    mandatory_keys = {'owner', 'header'}
+    valid_keys = {'owner', 'start_year', 'substring', 'template'}
+    mandatory_keys = {'owner', 'template'}
     config_keys = set(config)
     invalid_keys = config_keys - valid_keys
     missing_keys = mandatory_keys - config_keys

@@ -90,7 +90,7 @@ def test_validate_config():
     config = {
         'owner': 'Ordo Templi Orientis',
         'start_year': 1904,
-        'header': ''
+        'template': ''
     }
     _validate_config(config)
 
