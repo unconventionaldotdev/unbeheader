@@ -8,7 +8,7 @@ lint:
 
 .PHONY: headertest
 headertest:
-	unbeheader --ci
+	unbehead --ci
 
 .PHONY: pytest
 pytest:
