@@ -4,7 +4,7 @@ in-project = true
 
 [tool.poetry]
 name = "unbeheader"
-version = "1.0.2"
+version = "1.0.5"
 description = "Never fail to maintain your file headers"
 repository = "https://github.com/unconventional/unbeheader"
 readme = "README.md"
@@ -25,7 +25,7 @@ classifiers = [
 ]
 
 [tool.poetry.scripts]
-unbeheader = "unbeheader.cli:main"
+unbehead = "unbeheader.cli:main"
 
 [tool.poetry.dependencies]
 python = ">=3.9.0"
