@@ -42,25 +42,25 @@ It's possible to run Unbeheader in two modes: `fix` and `check`. The `fix` mode 
 
 > **NOTE:** Neither `fix` or `check` modes will work unless Unbeheader can find a `.header.yaml` configuration file. Read more on the [Configuration](#configuration) section.
 
-To run Unbeheader in `fix` mode simply run the `unbeheader` command:
+To run Unbeheader in `fix` mode simply run the `unbehead` command:
 
 ```sh
-unbeheader                            # Update all the files in the Git repository
-unbeheader --path .                   # Update all the files under the current directory
-unbeheader --path /path/to/directory  # Update all the files under a directory
-unbeheader --path /path/to/file.py    # Update a single file
+unbehead                            # Update all the files in the Git repository
+unbehead --path .                   # Update all the files under the current directory
+unbehead --path /path/to/directory  # Update all the files under a directory
+unbehead --path /path/to/file.py    # Update a single file
 ```
 
 By default, Unbeheader will pass the current year to generate the `{dates}` placeholder in the header template. To pass a different year, use the `--year` flag:
 
 ```sh
-unbeheader --year 1947
+unbehead --year 1947
 ```
 
 To run Unbeheader in `check` mode, use the `--ci` flag:
 
 ```sh
-unbehader --ci
+unbehead --ci
 ```
 
 ## Configuration
@@ -99,7 +99,7 @@ Setting value keys:
 
 Template value keys:
 - `owner`: The owner of the project, used to generate the `{owner}` placeholder. This key is required.
-- `start_year`: The start year of the header, used to generate the `{dates}` placeholder. It defaults to the year passed to the `unbeheader` command.
+- `start_year`: The start year of the header, used to generate the `{dates}` placeholder. It defaults to the year passed to the `unbehead` command.
 
 Finally, the `template` key is a multi-line string that will be used to generate the header template. The template accepts the interpolation of certain placeholders. These are:
 
@@ -137,7 +137,7 @@ You may now create the virtualenv and install the project with its dependencies 
 poetry install
 ```
 
-Once installed, you can invoke the `unbeheader` command with:
+Once installed, you can invoke the `unbehead` command with:
 
 ```sh
 poetry run -- unbeheader
@@ -147,7 +147,7 @@ For convenience, you may want to spawn a shell within the virtualenv with:
 
 ```sh
 poetry shell
-unbeheader
+unbehead
 ```
 
 ### Contributing
