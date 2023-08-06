@@ -42,12 +42,12 @@ def main(ci: bool, year: int, path: str):
     else:
         error = _run_on_repo(year, ci)
     if not error:
-        click.secho('\u2705 All headers are up to date', fg='green')
+        click.secho('✅ All headers are up to date', fg='green')
     elif ci:
-        click.secho('\u274C Some headers need to be updated or added', fg='red')
+        click.secho('❌ Some headers need to be added or updated', fg='red')
         sys.exit(1)
     else:
-        click.secho('\U0001F504 Some headers have been updated (or are missing)', fg='yellow')
+        click.secho('🔄 Some headers have been updated', fg='yellow')
 
 
 def _run_on_directory(path: Path, year: int, ci: bool) -> bool:

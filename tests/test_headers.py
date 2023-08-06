@@ -92,7 +92,7 @@ def test_update_header_for_current_dir(_do_update_header, get_config, tmp_path):
 
 
 @pytest.mark.parametrize(('before_content', 'after_content'), (
-    # Test that empty files remain without header
+    # Test that files with only header are kept empty
     ('''
         # This file is part of Thelema.
         # Copyright (C) 1904 Ordo Templi Orientis
@@ -149,6 +149,41 @@ def test_do_update_header(before_content, after_content, capsys, config, create_
     assert file_path.read_text() == dedent(after_content).lstrip()
 
 
+@pytest.mark.parametrize(('before_content', 'after_content'), (
+    # Test that header is added in file missing it
+    ('''
+        print('Beware of the knowledge you will gain.')
+     ''',
+     '''
+        # This file is part of Thelema.
+        # Copyright (C) 1904 Ordo Templi Orientis
+
+        print('Beware of the knowledge you will gain.')
+     '''),
+    # Test that header is added after shebang
+    ('''
+        #!/usr/bin/env python
+
+        print('Beware of the knowledge you will gain.')
+    ''',
+    '''
+        #!/usr/bin/env python
+        # This file is part of Thelema.
+        # Copyright (C) 1904 Ordo Templi Orientis
+
+        print('Beware of the knowledge you will gain.')
+    '''),
+))
+def test_do_update_header_for_not_found(before_content, after_content, capsys, config,
+                                        create_py_file, py_files_settings):
+    file_path = create_py_file(dedent(before_content).lstrip())
+    result = _do_update_header(file_path, config, ci=False, **py_files_settings)
+    captured = capsys.readouterr()
+    assert result is True
+    assert 'Adding header' in captured.out
+    assert file_path.read_text() == dedent(after_content).lstrip()
+
+
 def test_do_update_header_for_no_changes(config, create_py_file, py_files_settings):
     file_content = dedent('''
         # This file is part of Thelema.
@@ -158,35 +193,35 @@ def test_do_update_header_for_no_changes(config, create_py_file, py_files_settin
     ''').lstrip()
     file_path = create_py_file(file_content)
     result = _do_update_header(file_path, config, ci=False, **py_files_settings)
-    assert result is None
+    assert result is False
 
 
-def test_do_update_header_for_ci(capsys, config, create_py_file, py_files_settings):
-    file_content = dedent('''
+@pytest.mark.parametrize(('file_content', 'header_found'), (
+    ('''
         # This file is part of Thelema.
         print('Beware of the knowledge you will gain.')
-    ''').lstrip()
+    ''', True),
+    ('''
+        print('Beware of the knowledge you will gain.')
+    ''', False),
+))
+def test_do_update_header_for_ci(file_content, header_found, capsys, config, create_py_file, py_files_settings):
+    file_content = dedent(file_content).lstrip()
     file_path = create_py_file(file_content)
     result = _do_update_header(file_path, config, ci=True, **py_files_settings)
     captured = capsys.readouterr()
     assert result is True
-    assert 'Incorrect header' in captured.out
     assert open(file_path).read() == file_content
+    if header_found:
+        assert 'Incorrect header' in captured.out
+    else:
+        assert 'Missing header' in captured.out
 
 
 def test_do_update_header_for_empty_file(create_py_file, py_files_settings):
     file_path = create_py_file('')
     result = _do_update_header(file_path, {}, ci=False, **py_files_settings)
     assert result is False
-
-
-def test_do_update_header_for_not_found(capsys, create_py_file, py_files_settings):
-    config = {'substring': DEFAULT_SUBSTRING}
-    file_path = create_py_file("print('Beware of the knowledge you will gain.')")
-    result = _do_update_header(file_path, config, ci=False, **py_files_settings)
-    captured = capsys.readouterr()
-    assert 'Missing header' in captured.out
-    assert result is True
 
 
 @pytest.mark.parametrize(('extension', 'expected'), (

@@ -58,15 +58,17 @@ def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], commen
                 content = ''
             else:
                 content = content[:match.start()] + _generate_header(comments | config) + match_end
+    if not found:
+        content = _generate_header(comments | config) + '\n' + content.lstrip()
     if shebang_line:
         content = shebang_line + '\n' + content
-    if content != orig_content:
-        msg = 'Incorrect header in {}' if ci else cformat('%{green!}Updating header of %{blue!}{}')
-        print(msg.format(os.path.relpath(file_path)))
-        if not ci:
-            file_path.write_text(content)
-        return True
-    elif not found:
-        msg = 'Missing header in {}' if ci else cformat('%{red!}Missing header%{reset} in %{blue!}{}')
-        print(msg.format(os.path.relpath(file_path)))
-        return True
+    if content == orig_content:
+        return False
+    if found:
+        msg = 'Incorrect header in %{white!}{}' if ci else 'Updating header in %{white!}{}'
+    else:
+        msg = 'Missing header in %{white!}{}' if ci else 'Adding header in %{white!}{}'
+    print(f'· {cformat(msg).format(os.path.relpath(file_path))}')
+    if not ci:
+        file_path.write_text(content)
+    return True
