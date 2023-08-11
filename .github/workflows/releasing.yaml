@@ -25,12 +25,21 @@ jobs:
       - name: Build package
         run: |
           poetry build
+      - name: Extract changelog
+        run: |
+          .github/bin/extract-changelog.py ${{ github.ref_name }} /tmp/changelog.md
       - uses: actions/upload-artifact@v3
         name: Upload build artifacts
         with:
           name: wheel
           retention-days: 7
           path: ./dist/*.whl
+      - uses: actions/upload-artifact@v3
+        name: Upload changelog
+        with:
+          name: changelog
+          retention-days: 7
+          path: /tmp/changelog.md
 
   release:
     needs: build
@@ -45,6 +54,7 @@ jobs:
           --draft
           --repo ${{ github.repository }}
           --title ${{ github.ref_name }}
+          --notes-file changelog/changelog.md
           ${{ github.ref_name }}
           wheel/*
         env:
