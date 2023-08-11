@@ -110,6 +110,20 @@ def test_update_header_for_current_dir(_do_update_header, get_config, tmp_path):
 
         print('Beware of the knowledge you will gain.')
     '''),
+    # Test that multiple newlines are removed in one go
+    ('''
+
+        # This file is part of Thelema.
+        # Copyright (C) 1904 Ordo Templi Orientis
+
+        print('Beware of the knowledge you will gain.')
+    ''',
+    '''
+        # This file is part of Thelema.
+        # Copyright (C) 1904 Ordo Templi Orientis
+
+        print('Beware of the knowledge you will gain.')
+    '''),
     # Test that outdated header is updated with the correct year
     ('''
         # This file is part of Thelema.
@@ -139,9 +153,27 @@ def test_update_header_for_current_dir(_do_update_header, get_config, tmp_path):
 
         print('Beware of the knowledge you will gain.')
     '''),
+    # Test that multiple newlines are removed in one go with shebang
+    ('''
+        #!/usr/bin/env python
+
+
+        # This file is part of Thelema.
+        # Copyright (C) 1904 Ordo Templi Orientis
+
+        print('Beware of the knowledge you will gain.')
+    ''',
+    '''
+        #!/usr/bin/env python
+        # This file is part of Thelema.
+        # Copyright (C) 1904 Ordo Templi Orientis
+
+        print('Beware of the knowledge you will gain.')
+    '''),
 ))
 def test_do_update_header(before_content, after_content, capsys, config, create_py_file, py_files_settings):
-    file_path = create_py_file(dedent(before_content).lstrip())
+    content = dedent(before_content)[1:] # Remove indentation and leading newline
+    file_path = create_py_file(content)
     result = _do_update_header(file_path, config, ci=False, **py_files_settings)
     captured = capsys.readouterr()
     assert result is True
@@ -176,7 +208,8 @@ def test_do_update_header(before_content, after_content, capsys, config, create_
 ))
 def test_do_update_header_for_not_found(before_content, after_content, capsys, config,
                                         create_py_file, py_files_settings):
-    file_path = create_py_file(dedent(before_content).lstrip())
+    content = dedent(before_content)[1:] # Remove indentation and leading newline
+    file_path = create_py_file(content)
     result = _do_update_header(file_path, config, ci=False, **py_files_settings)
     captured = capsys.readouterr()
     assert result is True
