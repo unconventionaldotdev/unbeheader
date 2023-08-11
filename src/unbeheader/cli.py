@@ -80,7 +80,16 @@ def _run_on_repo(year: int, ci: bool) -> bool:
         print(cformat('Updating headers to the year %{yellow!}{year}%{reset} for all '
                       'git-tracked files...').format(year=year))
     try:
-        for file_path in subprocess.check_output(['git', 'ls-files'], text=True).splitlines():
+        cmd = ('git', 'ls-files')
+        untracked_flags = ('--others', '--exclude-standard')
+        deleted_flags = ('--deleted',)
+        # Get all files tracked by git
+        git_file_paths = set(subprocess.check_output(cmd, text=True).splitlines())
+        # Include untracked files
+        git_file_paths |= set(subprocess.check_output(cmd + untracked_flags, text=True).splitlines())
+        # Exclude deleted files
+        git_file_paths -= set(subprocess.check_output(cmd + deleted_flags, text=True).splitlines())
+        for file_path in git_file_paths:
             file_path = Path(file_path).absolute()
             if not is_excluded(file_path.parent, Path.cwd()):
                 if update_header(file_path, year, ci):

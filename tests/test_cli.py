@@ -83,13 +83,45 @@ def test_run_on_directory(update_header, is_excluded, updated, tmp_path):
 @mock.patch('unbeheader.cli.update_header')
 @pytest.mark.parametrize('updated', (True, False))
 def test_run_on_repo(update_header, is_excluded, check_output, updated):
-    check_output.return_value = '/path/to/somewhere.py\n/path/to/elsewhere.py\n'
+    check_output.side_effect = [
+        '/path/to/somewhere.py\n/path/to/elsewhere.py\n',  # git ls-files
+        '',                                                # git ls-files --others --exclude-standard
+        ''                                                 # git ls-files --deleted
+    ]
     update_header.return_value = updated
     is_excluded.return_value = False
     error = _run_on_repo(date.today().year, False)
     assert error == updated
     assert is_excluded.call_count == 2
     assert update_header.call_count == 2
+
+
+@mock.patch('subprocess.check_output')
+@mock.patch('unbeheader.cli.is_excluded')
+@mock.patch('unbeheader.cli.update_header')
+def test_run_on_repo_for_deleted_files(update_header, is_excluded, check_output):
+    check_output.side_effect = [
+        '/path/to/deleted.py',  # git ls-files
+        '',                     # git ls-files --others --exclude-standard
+        '/path/to/deleted.py'   # git ls-files --deleted
+    ]
+    is_excluded.return_value = False
+    _run_on_repo(date.today().year, False)
+    update_header.assert_not_called()
+
+
+@mock.patch('subprocess.check_output')
+@mock.patch('unbeheader.cli.is_excluded')
+@mock.patch('unbeheader.cli.update_header')
+def test_run_on_repo_for_untracked_files(update_header, is_excluded, check_output):
+    check_output.side_effect = [
+        '',                 # git ls-files
+        '/path/to/new.py',  # git ls-files --others --exclude-standard
+        ''                  # git ls-files --deleted
+    ]
+    is_excluded.return_value = False
+    _run_on_repo(date.today().year, False)
+    update_header.assert_called_once()
 
 
 def test_run_on_repo_for_non_repo(tmp_path):
