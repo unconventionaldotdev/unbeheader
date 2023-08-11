@@ -43,11 +43,14 @@ def _generate_header(data: dict) -> str:
 def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], comments: dict, ci: bool) -> bool:
     found = False
     content = orig_content = file_path.read_text()
+    # Do nothing for empty files
     if not content.strip():
         return False
+    # Save the shebang line if there is one
     shebang_line = None
     if content.startswith('#!/'):
         shebang_line, content = content.split('\n', 1)
+    # Find and update the header
     for match in regex.finditer(content):
         if config['substring'] in match.group():
             found = True
@@ -58,17 +61,24 @@ def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], commen
                 content = ''
             else:
                 content = content[:match.start()] + _generate_header(comments | config) + match_end
+    # Strip leading empty characters
+    content = content.lstrip()
+    # Add the header if it was not found
     if not found:
-        content = _generate_header(comments | config) + '\n' + content.lstrip()
+        content = _generate_header(comments | config) + '\n' + content
+    # Readd the shebang line if it was there
     if shebang_line:
         content = shebang_line + '\n' + content
+    # Report that nothing changed
     if content == orig_content:
         return False
+    # Print header update results
     if found:
         msg = 'Incorrect header in %{white!}{}' if ci else 'Updating header in %{white!}{}'
     else:
         msg = 'Missing header in %{white!}{}' if ci else 'Adding header in %{white!}{}'
     print(f'· {cformat(msg).format(os.path.relpath(file_path))}')
+    # Write the updated file to disk
     if not ci:
         file_path.write_text(content)
     return True
