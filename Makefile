@@ -16,3 +16,9 @@ pytest:
 
 .PHONY: test
 test: headertest pytest
+
+# -- releasing -----------------------------------------------------------------
+
+.PHONY: tag
+tag:
+	bin/tag.sh
