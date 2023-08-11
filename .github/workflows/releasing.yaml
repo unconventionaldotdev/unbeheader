@@ -2,40 +2,21 @@ name: releasing
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+    tags:
+      - 'v*'
 
 jobs:
-  tag:
+  check:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - name: Prepare Git environment
+      - name: Check tag version
         run: |
-          git fetch origin 'refs/tags/*:refs/tags/*'
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-      - name: Create tag
-        run: |
-          bin/tag.sh
-      - name: Push tag
-        if: github.event_name != 'pull_request'
-        run: |
-          git push --tags
+          .github/bin/check-version.sh "${GITHUB_REF#refs/tags/v}"
 
-  release:
-    needs: tag
+  build:
+    needs: check
     runs-on: ubuntu-22.04
-    if: github.event_name != 'pull_request'
-    environment:
-      name: release
-      url: https://pypi.org/project/unbeheader/
-    permissions:
-      id-token: write
     steps:
       - uses: actions/checkout@v3
       - name: Install poetry
@@ -44,5 +25,56 @@ jobs:
       - name: Build package
         run: |
           poetry build
+      - uses: actions/upload-artifact@v3
+        name: Upload build artifacts
+        with:
+          name: wheel
+          retention-days: 7
+          path: ./dist/*.whl
+
+  release:
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v3
+      - name: Draft release
+        run: >-
+          gh release create
+          --draft
+          --repo ${{ github.repository }}
+          --title ${{ github.ref_name }}
+          ${{ github.ref_name }}
+          wheel/*
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  publish:
+    needs: release
+    environment:
+      name: pypi
+      url: https://pypi.org/project/unbeheader/
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v3
+      - name: Publish package to Test PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: wheel/
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: wheel/
+      - name: Publish release
+        run: >-
+          gh release edit
+          --draft=false
+          --repo ${{ github.repository }}
+          ${{ github.ref_name }}
+        env:
+          GH_TOKEN: ${{ github.token }}
