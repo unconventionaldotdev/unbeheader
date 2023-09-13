@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.1 (unreleased)
+## v1.1.1
 
 - Fixed leading newlines not being removed in one go.
 - Excluded deleted and included untracked files when run on a Git repository.
