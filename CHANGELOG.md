@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.2 (unreleased)
+
+- Removed unicode bullet point dron output.
+- Removed colors from CI output.
+
 ## v1.1.1
 
 - Fixed leading newlines not being removed in one go.
