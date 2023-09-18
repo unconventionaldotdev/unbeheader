@@ -24,22 +24,6 @@ def update_header(file_path: Path, year: int, check: bool = False) -> bool:
     return _do_update_header(file_path, config, SUPPORTED_FILES[ext]['regex'], SUPPORTED_FILES[ext]['comments'], check)
 
 
-def _generate_header(data: dict) -> str:
-    if 'start_year' not in data:
-        data['start_year'] = data['end_year']
-    if data['start_year'] == data['end_year']:
-        data['dates'] = data['start_year']
-    else:
-        data['dates'] = '{} - {}'.format(data['start_year'], data['end_year'])
-    template_data = {k: v for k, v in data.items() if k not in {'root', 'substring', 'template'}}
-    try:
-        comment = '\n'.join(line.rstrip() for line in data['template'].format(**template_data).strip().splitlines())
-    except KeyError as e:
-        click.secho(f'Invalid placeholder {{{e.args[0]}}} found in template', fg='red', err=True)
-        sys.exit(1)
-    return f'{comment}\n'
-
-
 def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], comments: dict, check: bool) -> bool:
     found = False
     content = orig_content = file_path.read_text()
@@ -78,6 +62,22 @@ def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], commen
     if not check:
         file_path.write_text(content)
     return True
+
+
+def _generate_header(data: dict) -> str:
+    if 'start_year' not in data:
+        data['start_year'] = data['end_year']
+    if data['start_year'] == data['end_year']:
+        data['dates'] = data['start_year']
+    else:
+        data['dates'] = '{} - {}'.format(data['start_year'], data['end_year'])
+    template_data = {k: v for k, v in data.items() if k not in {'root', 'substring', 'template'}}
+    try:
+        comment = '\n'.join(line.rstrip() for line in data['template'].format(**template_data).strip().splitlines())
+    except KeyError as e:
+        click.secho(f'Invalid placeholder {{{e.args[0]}}} found in template', fg='red', err=True)
+        sys.exit(1)
+    return f'{comment}\n'
 
 
 def _print_results(file_path: Path, found: bool, check: bool):
