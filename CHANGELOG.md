@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.2 (unreleased)
+
+- Renamed CLI `--ci` flag to `--check`.
+
 ## v1.1.1
 
 - Fixed leading newlines not being removed in one go.

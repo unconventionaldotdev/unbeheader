@@ -57,10 +57,10 @@ By default, Unbeheader will pass the current year to generate the `{dates}` plac
 unbehead --year 1947
 ```
 
-To run Unbeheader in `check` mode, use the `--ci` flag:
+To run Unbeheader in `check` mode, use the `--check` flag:
 
 ```sh
-unbehead --ci
+unbehead --check
 ```
 
 ## Configuration

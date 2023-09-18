@@ -53,12 +53,12 @@ def test_update_header(_do_update_header, get_config, create_py_file):
     config = {'owner': 'Ordo Templi Orientis'}
     get_config.return_value = config
     year = date.today().year
-    ci = True
+    check = True
     file_path = create_py_file('')
     file_ext = file_path.suffix[1:]
-    update_header(file_path, year, ci)
+    update_header(file_path, year, check)
     _do_update_header.assert_called_once_with(
-        file_path, config, SUPPORTED_FILES[file_ext]['regex'], SUPPORTED_FILES[file_ext]['comments'], ci
+        file_path, config, SUPPORTED_FILES[file_ext]['regex'], SUPPORTED_FILES[file_ext]['comments'], check
     )
 
 
@@ -174,7 +174,7 @@ def test_update_header_for_current_dir(_do_update_header, get_config, tmp_path):
 def test_do_update_header(before_content, after_content, capsys, config, create_py_file, py_files_settings):
     content = dedent(before_content)[1:] # Remove indentation and leading newline
     file_path = create_py_file(content)
-    result = _do_update_header(file_path, config, ci=False, **py_files_settings)
+    result = _do_update_header(file_path, config, check=False, **py_files_settings)
     captured = capsys.readouterr()
     assert result is True
     assert 'Updating header' in captured.out
@@ -210,7 +210,7 @@ def test_do_update_header_for_not_found(before_content, after_content, capsys, c
                                         create_py_file, py_files_settings):
     content = dedent(before_content)[1:] # Remove indentation and leading newline
     file_path = create_py_file(content)
-    result = _do_update_header(file_path, config, ci=False, **py_files_settings)
+    result = _do_update_header(file_path, config, check=False, **py_files_settings)
     captured = capsys.readouterr()
     assert result is True
     assert 'Adding header' in captured.out
@@ -225,7 +225,7 @@ def test_do_update_header_for_no_changes(config, create_py_file, py_files_settin
         print('Beware of the knowledge you will gain.')
     ''').lstrip()
     file_path = create_py_file(file_content)
-    result = _do_update_header(file_path, config, ci=False, **py_files_settings)
+    result = _do_update_header(file_path, config, check=False, **py_files_settings)
     assert result is False
 
 
@@ -238,10 +238,10 @@ def test_do_update_header_for_no_changes(config, create_py_file, py_files_settin
         print('Beware of the knowledge you will gain.')
     ''', False),
 ))
-def test_do_update_header_for_ci(file_content, header_found, capsys, config, create_py_file, py_files_settings):
+def test_do_update_header_for_check(file_content, header_found, capsys, config, create_py_file, py_files_settings):
     file_content = dedent(file_content).lstrip()
     file_path = create_py_file(file_content)
-    result = _do_update_header(file_path, config, ci=True, **py_files_settings)
+    result = _do_update_header(file_path, config, check=True, **py_files_settings)
     captured = capsys.readouterr()
     assert result is True
     assert open(file_path).read() == file_content
@@ -253,7 +253,7 @@ def test_do_update_header_for_ci(file_content, header_found, capsys, config, cre
 
 def test_do_update_header_for_empty_file(create_py_file, py_files_settings):
     file_path = create_py_file('')
-    result = _do_update_header(file_path, {}, ci=False, **py_files_settings)
+    result = _do_update_header(file_path, {}, check=False, **py_files_settings)
     assert result is False
 
 
