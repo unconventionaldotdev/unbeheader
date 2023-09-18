@@ -4,6 +4,7 @@
 
 - Renamed CLI `--ci` flag to `--check`.
 - Removed Unicode interpuct from CLI output.
+- Removed colors from CLI output when CI envvar is set.
 
 ## v1.1.1
 
