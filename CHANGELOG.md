@@ -3,6 +3,7 @@
 ## v1.1.2 (unreleased)
 
 - Renamed CLI `--ci` flag to `--check`.
+- Removed Unicode interpuct from CLI output.
 
 ## v1.1.1
 
