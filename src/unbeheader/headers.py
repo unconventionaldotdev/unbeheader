@@ -73,12 +73,24 @@ def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], commen
     if content == orig_content:
         return False
     # Print header update results
-    if found:
-        msg = 'Incorrect header in %{white!}{}' if check else 'Updating header in %{white!}{}'
-    else:
-        msg = 'Missing header in %{white!}{}' if check else 'Adding header in %{white!}{}'
-    print(cformat(msg).format(os.path.relpath(file_path)))
+    _print_results(file_path, found=found, check=check)
     # Write the updated file to disk
     if not check:
         file_path.write_text(content)
     return True
+
+
+def _print_results(file_path: Path, found: bool, check: bool):
+    ci = os.environ.get('CI') in {'1', 'true'}
+    if found:
+        check_msg = 'Incorrect header in {}' if ci else 'Incorrect header in %{white!}{}'
+        fix_msg = 'Updating header in {}' if ci else 'Updating header in %{white!}{}'
+        msg = check_msg if check else fix_msg
+    else:
+        check_msg = 'Missing header in {}' if ci else 'Missing header in %{white!}{}'
+        fix_msg = 'Adding header in {}' if ci else 'Adding header in %{white!}{}'
+        msg = check_msg if check else fix_msg
+    if ci:
+        print(msg.format(os.path.relpath(file_path)))
+    else:
+        print(cformat(msg).format(os.path.relpath(file_path)))

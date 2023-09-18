@@ -63,6 +63,12 @@ To run Unbeheader in `check` mode, use the `--check` flag:
 unbehead --check
 ```
 
+It is possible to disable colors in the output by setting the `CI` environment variable to a truthy value:
+
+```sh
+export CI=1
+```
+
 ## Configuration
 
 Unbeheader reads its configuration from `.header.yaml` files placed in the file tree of the project. It is possible to override configuration values by placing `.header.yaml` files in subdirectories. This is useful when different headers are needed for different parts of the project. It is also possible to exclude a directory by placing an empty `.no-header` file in it.

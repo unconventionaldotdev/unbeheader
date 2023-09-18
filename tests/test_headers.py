@@ -6,12 +6,16 @@ from textwrap import dedent
 from unittest import mock
 
 import pytest
+from colorclass import Color
 
 from unbeheader import SUPPORTED_FILES
 from unbeheader.config import DEFAULT_SUBSTRING
 from unbeheader.headers import _do_update_header
 from unbeheader.headers import _generate_header
+from unbeheader.headers import _print_results
 from unbeheader.headers import update_header
+
+COLOR_RESET = Color('{/all}')
 
 
 @pytest.fixture
@@ -91,6 +95,7 @@ def test_update_header_for_current_dir(_do_update_header, get_config, tmp_path):
     assert _do_update_header.call_count == 0
 
 
+@mock.patch('unbeheader.headers._print_results')
 @pytest.mark.parametrize(('before_content', 'after_content'), (
     # Test that files with only header are kept empty
     ('''
@@ -171,16 +176,16 @@ def test_update_header_for_current_dir(_do_update_header, get_config, tmp_path):
         print('Beware of the knowledge you will gain.')
     '''),
 ))
-def test_do_update_header(before_content, after_content, capsys, config, create_py_file, py_files_settings):
+def test_do_update_header(_print_results, before_content, after_content, config, create_py_file, py_files_settings):
     content = dedent(before_content)[1:] # Remove indentation and leading newline
     file_path = create_py_file(content)
     result = _do_update_header(file_path, config, check=False, **py_files_settings)
-    captured = capsys.readouterr()
     assert result is True
-    assert 'Updating header' in captured.out
     assert file_path.read_text() == dedent(after_content).lstrip()
+    _print_results.assert_called_once_with(file_path, found=True, check=False)
 
 
+@mock.patch('unbeheader.headers._print_results')
 @pytest.mark.parametrize(('before_content', 'after_content'), (
     # Test that header is added in file missing it
     ('''
@@ -206,15 +211,14 @@ def test_do_update_header(before_content, after_content, capsys, config, create_
         print('Beware of the knowledge you will gain.')
     '''),
 ))
-def test_do_update_header_for_not_found(before_content, after_content, capsys, config,
+def test_do_update_header_for_not_found(_print_results, before_content, after_content, config,
                                         create_py_file, py_files_settings):
     content = dedent(before_content)[1:] # Remove indentation and leading newline
     file_path = create_py_file(content)
     result = _do_update_header(file_path, config, check=False, **py_files_settings)
-    captured = capsys.readouterr()
     assert result is True
-    assert 'Adding header' in captured.out
     assert file_path.read_text() == dedent(after_content).lstrip()
+    _print_results.assert_called_once_with(file_path, found=False, check=False)
 
 
 def test_do_update_header_for_no_changes(config, create_py_file, py_files_settings):
@@ -229,6 +233,7 @@ def test_do_update_header_for_no_changes(config, create_py_file, py_files_settin
     assert result is False
 
 
+@mock.patch('unbeheader.headers._print_results')
 @pytest.mark.parametrize(('file_content', 'header_found'), (
     ('''
         # This file is part of Thelema.
@@ -238,17 +243,14 @@ def test_do_update_header_for_no_changes(config, create_py_file, py_files_settin
         print('Beware of the knowledge you will gain.')
     ''', False),
 ))
-def test_do_update_header_for_check(file_content, header_found, capsys, config, create_py_file, py_files_settings):
+def test_do_update_header_for_check(_print_results, file_content, header_found, config,
+                                    create_py_file, py_files_settings):
     file_content = dedent(file_content).lstrip()
     file_path = create_py_file(file_content)
     result = _do_update_header(file_path, config, check=True, **py_files_settings)
-    captured = capsys.readouterr()
     assert result is True
     assert open(file_path).read() == file_content
-    if header_found:
-        assert 'Incorrect header' in captured.out
-    else:
-        assert 'Missing header' in captured.out
+    _print_results.assert_called_once_with(file_path, found=header_found, check=True)
 
 
 def test_do_update_header_for_empty_file(create_py_file, py_files_settings):
@@ -314,3 +316,26 @@ def test_generate_header_for_invalid_placeholder(template, config):
     with pytest.raises(SystemExit) as exc:
         _generate_header(data)
     assert exc.value.code == 1
+
+
+@pytest.mark.parametrize(('found', 'check', 'expected'), (
+    (True, True, 'Incorrect header'),
+    (True, False, 'Updating header'),
+    (False, True, 'Missing header'),
+    (False, False, 'Adding header'),
+))
+def test_print_results(found, check, expected, monkeypatch, tmp_path, capsys):
+    monkeypatch.delenv('CI', raising=False)
+    _print_results(tmp_path, found, check)
+    captured = capsys.readouterr()
+    assert expected in captured.out
+    assert COLOR_RESET in captured.out
+
+@pytest.mark.parametrize(('envvar'), (
+    ('1'), ('true'),
+))
+def test_print_results_for_ci(envvar, monkeypatch, tmp_path, capsys):
+    monkeypatch.setenv('CI', envvar)
+    _print_results(tmp_path, True, True)
+    captured = capsys.readouterr()
+    assert COLOR_RESET not in captured.out
