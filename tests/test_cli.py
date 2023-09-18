@@ -44,7 +44,7 @@ def test_main_for_ci_error(_run_on_file, tmp_path):
     file_path = tmp_path / 'manuscript.py'
     file_path.touch()
     runner = CliRunner()
-    result = runner.invoke(main, ['--ci', '--path', file_path])
+    result = runner.invoke(main, ['--check', '--path', file_path])
     assert result.exit_code == 1
 
 

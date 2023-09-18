@@ -13,7 +13,7 @@ from .config import get_config
 from .util import cformat
 
 
-def update_header(file_path: Path, year: int, ci: bool = False) -> bool:
+def update_header(file_path: Path, year: int, check: bool = False) -> bool:
     """Update the header of a file."""
     config = get_config(file_path, year)
     ext = file_path.suffix[1:]
@@ -21,7 +21,7 @@ def update_header(file_path: Path, year: int, ci: bool = False) -> bool:
         return False
     if file_path.name.startswith('.'):
         return False
-    return _do_update_header(file_path, config, SUPPORTED_FILES[ext]['regex'], SUPPORTED_FILES[ext]['comments'], ci)
+    return _do_update_header(file_path, config, SUPPORTED_FILES[ext]['regex'], SUPPORTED_FILES[ext]['comments'], check)
 
 
 def _generate_header(data: dict) -> str:
@@ -40,7 +40,7 @@ def _generate_header(data: dict) -> str:
     return f'{comment}\n'
 
 
-def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], comments: dict, ci: bool) -> bool:
+def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], comments: dict, check: bool) -> bool:
     found = False
     content = orig_content = file_path.read_text()
     # Do nothing for empty files
@@ -74,11 +74,11 @@ def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], commen
         return False
     # Print header update results
     if found:
-        msg = 'Incorrect header in %{white!}{}' if ci else 'Updating header in %{white!}{}'
+        msg = 'Incorrect header in %{white!}{}' if check else 'Updating header in %{white!}{}'
     else:
-        msg = 'Missing header in %{white!}{}' if ci else 'Adding header in %{white!}{}'
+        msg = 'Missing header in %{white!}{}' if check else 'Adding header in %{white!}{}'
     print(f'· {cformat(msg).format(os.path.relpath(file_path))}')
     # Write the updated file to disk
-    if not ci:
+    if not check:
         file_path.write_text(content)
     return True
