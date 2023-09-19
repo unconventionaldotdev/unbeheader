@@ -1,5 +1,11 @@
 # -- linting -------------------------------------------------------------------
 
+.PHONY: mypy
+mypy:
+	# FIXME: Remove flag once it's possible to disable color via envvar.
+	#        The uncolored output is necessary on CI for the matcher to work.
+	mypy . --no-color-output
+
 .PHONY: ruff
 ruff:
 	ruff check .
@@ -9,7 +15,7 @@ unbehead:
 	unbehead --check
 
 .PHONY: lint
-lint: ruff unbehead
+lint: mypy ruff unbehead
 
 # -- testing -------------------------------------------------------------------
 

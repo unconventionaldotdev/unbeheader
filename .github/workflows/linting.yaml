@@ -10,9 +10,6 @@ on:
       - devel
       - master
 
-env:
-  NO_COLORS: true
-
 jobs:
   setup:
     runs-on: ubuntu-22.04
@@ -49,9 +46,13 @@ jobs:
         run: |
           poetry install
       - name: Run tests
+        env:
+          NO_COLORS: true  # Disable colors in ruff output
         run: |
+          echo "::add-matcher::.github/matchers/mypy.json"
           echo "::add-matcher::.github/matchers/ruff.json"
           echo "::add-matcher::.github/matchers/unbehead.json"
           poetry run -- make lint --keep-going
           echo "::remove-matcher owner=unbehead::"
           echo "::remove-matcher owner=ruff::"
+          echo "::remove-matcher owner=mypy::"
