@@ -9,13 +9,13 @@ from pathlib import Path
 import click
 from click import UsageError
 
-from . import SUPPORTED_FILES
+from . import SUPPORTED_FILE_TYPES
 from .headers import update_header
 from .util import cformat
 from .util import is_excluded
 
 USAGE = '''
-Updates all the headers in the supported files ({supported_files}).
+Updates all the headers in the supported files ({supported_file_types}).
 By default, all the files tracked by git in the current repository are updated
 to the current year.
 
@@ -23,7 +23,7 @@ You can specify a year to update to as well as a file or directory.
 This will update all the supported files in the scope including those not tracked
 by git. If the directory does not contain any supported files (or if the file
 specified is not supported) nothing will be updated.
-'''.format(supported_files=', '.join(SUPPORTED_FILES)).strip()
+'''.format(supported_file_types=', '.join(SUPPORTED_FILE_TYPES)).strip()
 
 
 @click.command(help=USAGE)
@@ -32,9 +32,10 @@ specified is not supported) nothing will be updated.
                                             'prevents files from actually being updated.')
 @click.option('--year', '-y', type=click.IntRange(min=1000), default=date.today().year, metavar='YEAR',
               help='Indicate the target year')
-@click.option('--path', '-p', type=click.Path(exists=True), help='Restrict updates to a specific file or directory')
-def main(check: bool, year: int, path: str):
-    path = Path(path).resolve() if path else None
+@click.option('--path', '-p', 'path_str', type=click.Path(exists=True),
+              help='Restrict updates to a specific file or directory')
+def main(check: bool, year: int, path_str: str) -> None:
+    path = Path(path_str).resolve() if path_str else None
     if path and path.is_dir():
         error = _run_on_directory(path, year, check)
     elif path and path.is_file():
@@ -89,8 +90,8 @@ def _run_on_repo(year: int, check: bool) -> bool:
         git_file_paths |= set(subprocess.check_output(cmd + untracked_flags, text=True).splitlines())
         # Exclude deleted files
         git_file_paths -= set(subprocess.check_output(cmd + deleted_flags, text=True).splitlines())
-        for file_path in git_file_paths:
-            file_path = Path(file_path).absolute()
+        for file_path_str in git_file_paths:
+            file_path = Path(file_path_str).absolute()
             if not is_excluded(file_path.parent, Path.cwd()):
                 if update_header(file_path, year, check):
                     error = True

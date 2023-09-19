@@ -3,8 +3,11 @@
 
 import re
 from pathlib import Path
+from re import Match
 
 from colorclass import Color
+
+from .typing import PathCache
 
 # The name of the files that exclude the directory from header updates
 EXCLUDE_FILE_NAME = '.no-header'
@@ -15,7 +18,7 @@ def cformat(string: str) -> Color:
 
     Bold foreground can be achieved by suffixing the color with a '!'.
     """
-    def repl(m):
+    def repl(m: Match[str]) -> Color:
         bg = bold = ''
         if m.group('fg_bold'):
             bold = '{b}'
@@ -32,7 +35,7 @@ def cformat(string: str) -> Color:
     return Color(string)
 
 
-def is_excluded(path: Path, root_path: Path = None, cache: dict = None) -> bool:
+def is_excluded(path: Path, root_path: Path | None = None, cache: PathCache | None = None) -> bool:
     """"Whether the path is excluded by a .no-headers file.
 
     The .no-headers file is searched for in the path and all parents up to the root.

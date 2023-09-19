@@ -8,6 +8,8 @@ from pathlib import Path
 import click
 import yaml
 
+from .typing import ConfigDict
+
 # The substring which must be part of a comment block in order for the comment to be updated by the header
 DEFAULT_SUBSTRING = 'This file is part of'
 
@@ -15,7 +17,7 @@ DEFAULT_SUBSTRING = 'This file is part of'
 CONFIG_FILE_NAME = '.header.yaml'
 
 
-def get_config(path: Path, end_year: int) -> dict:
+def get_config(path: Path, end_year: int) -> ConfigDict:
     """Get configuration from headers files."""
     config = _load_config(path)
     _validate_config(config)
@@ -24,8 +26,8 @@ def get_config(path: Path, end_year: int) -> dict:
     return config
 
 
-def _load_config(path: Path) -> dict:
-    config = {}
+def _load_config(path: Path) -> ConfigDict:
+    config: ConfigDict = {}
     found = False
     for dir_path in _walk_to_root(path):
         check_path = dir_path / CONFIG_FILE_NAME
@@ -40,7 +42,7 @@ def _load_config(path: Path) -> dict:
     return config
 
 
-def _validate_config(config: dict):
+def _validate_config(config: ConfigDict) -> None:
     valid_keys = {'owner', 'start_year', 'substring', 'template'}
     mandatory_keys = {'owner', 'template'}
     config_keys = set(config)
