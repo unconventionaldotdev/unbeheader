@@ -10,6 +10,9 @@ SUPPORTED_FILE_TYPES: dict[str, SupportedFileType] = {
     'py': SupportedFileType(
         re.compile(r'((^#|[\r\n]#).*)*'),
         CommentSkeleton('#', '#')),
+    'pyi': SupportedFileType(
+        re.compile(r'((^#|[\r\n]#).*)*'),
+        CommentSkeleton('#', '#')),
     'wsgi': SupportedFileType(
         re.compile(r'((^#|[\r\n]#).*)*'),
         CommentSkeleton('#', '#')),
