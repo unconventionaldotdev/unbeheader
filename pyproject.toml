@@ -34,8 +34,10 @@ pyyaml = ">=6"
 click = ">=8"
 
 [tool.poetry.group.dev.dependencies]
+mypy = "^1.5.1"
 pytest = "^7.4.0"
 ruff = "^0.0.280"
+types-pyyaml = "^6.0.12.11"
 
 [build-system]
 requires = ["poetry-core"]

@@ -5,6 +5,7 @@
 dist/
 
 # temporary directories
+.mypy_cache/
 .pytest_cache/
 .ruff_cache/
 __pycache__/
