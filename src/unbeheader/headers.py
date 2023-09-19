@@ -3,13 +3,16 @@
 
 import os
 import sys
+from dataclasses import asdict
 from pathlib import Path
 from re import Pattern
 
 import click
 
-from . import SUPPORTED_FILES
+from . import SUPPORTED_FILE_TYPES
 from .config import get_config
+from .typing import CommentSkeleton
+from .typing import ConfigDict
 from .util import cformat
 
 
@@ -17,14 +20,17 @@ def update_header(file_path: Path, year: int, check: bool = False) -> bool:
     """Update the header of a file."""
     config = get_config(file_path, year)
     ext = file_path.suffix[1:]
-    if ext not in SUPPORTED_FILES or not file_path.is_file():
+    if ext not in SUPPORTED_FILE_TYPES or not file_path.is_file():
         return False
     if file_path.name.startswith('.'):
         return False
-    return _do_update_header(file_path, config, SUPPORTED_FILES[ext]['regex'], SUPPORTED_FILES[ext]['comments'], check)
+    return _do_update_header(
+        file_path, config, SUPPORTED_FILE_TYPES[ext].regex, SUPPORTED_FILE_TYPES[ext].comments, check
+    )
 
 
-def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], comments: dict, check: bool) -> bool:
+def _do_update_header(file_path: Path, config: ConfigDict, regex: Pattern[str], comments: CommentSkeleton,
+                      check: bool) -> bool:
     found = False
     content = orig_content = file_path.read_text()
     # Do nothing for empty files
@@ -44,12 +50,12 @@ def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], commen
                 # file is otherwise empty, we do not want a header in there
                 content = ''
             else:
-                content = content[:match.start()] + _generate_header(comments | config) + match_end
+                content = content[:match.start()] + _generate_header(asdict(comments) | config) + match_end
     # Strip leading empty characters
     content = content.lstrip()
     # Add the header if it was not found
     if not found:
-        content = _generate_header(comments | config) + '\n' + content
+        content = _generate_header(asdict(comments) | config) + '\n' + content
     # Readd the shebang line if it was there
     if shebang_line:
         content = shebang_line + '\n' + content
@@ -64,7 +70,7 @@ def _do_update_header(file_path: Path, config: dict, regex: Pattern[str], commen
     return True
 
 
-def _generate_header(data: dict) -> str:
+def _generate_header(data: ConfigDict) -> str:
     if 'start_year' not in data:
         data['start_year'] = data['end_year']
     if data['start_year'] == data['end_year']:
@@ -80,7 +86,7 @@ def _generate_header(data: dict) -> str:
     return f'{comment}\n'
 
 
-def _print_results(file_path: Path, found: bool, check: bool):
+def _print_results(file_path: Path, found: bool, check: bool) -> None:
     ci = os.environ.get('CI') in {'1', 'true'}
     if found:
         check_msg = 'Incorrect header in {}' if ci else 'Incorrect header in %{white!}{}'

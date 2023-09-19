@@ -1,6 +1,7 @@
 # This file is part of Unbeheader.
 # Copyright (C) CERN & UNCONVENTIONAL
 
+from dataclasses import asdict
 from datetime import date
 from textwrap import dedent
 from unittest import mock
@@ -8,7 +9,7 @@ from unittest import mock
 import pytest
 from colorclass import Color
 
-from unbeheader import SUPPORTED_FILES
+from unbeheader import SUPPORTED_FILE_TYPES
 from unbeheader.config import DEFAULT_SUBSTRING
 from unbeheader.headers import _do_update_header
 from unbeheader.headers import _generate_header
@@ -46,8 +47,8 @@ def create_py_file(tmp_path):
 @pytest.fixture
 def py_files_settings():
     return {
-        'regex': SUPPORTED_FILES['py']['regex'],
-        'comments': SUPPORTED_FILES['py']['comments']
+        'regex': SUPPORTED_FILE_TYPES['py'].regex,
+        'comments': SUPPORTED_FILE_TYPES['py'].comments
     }
 
 
@@ -62,7 +63,7 @@ def test_update_header(_do_update_header, get_config, create_py_file):
     file_ext = file_path.suffix[1:]
     update_header(file_path, year, check)
     _do_update_header.assert_called_once_with(
-        file_path, config, SUPPORTED_FILES[file_ext]['regex'], SUPPORTED_FILES[file_ext]['comments'], check
+        file_path, config, SUPPORTED_FILE_TYPES[file_ext].regex, SUPPORTED_FILE_TYPES[file_ext].comments, check
     )
 
 
@@ -81,7 +82,7 @@ def test_update_header_for_unsupported_file(_do_update_header, get_config, tmp_p
     year = date.today().year
     file_path = tmp_path / 'manuscript.txt'
     file_path.touch()
-    assert 'txt' not in SUPPORTED_FILES
+    assert 'txt' not in SUPPORTED_FILE_TYPES
     assert update_header(file_path, year) is False
     assert _do_update_header.call_count == 0
 
@@ -291,7 +292,7 @@ def test_do_update_header_for_empty_file(create_py_file, py_files_settings):
     '''),
 ))
 def test_generate_header(extension, expected, config):
-    data = SUPPORTED_FILES[extension]['comments'] | config
+    data = asdict(SUPPORTED_FILE_TYPES[extension].comments) | config
     header = _generate_header(data)
     assert header == dedent(expected).lstrip()
 
@@ -299,7 +300,7 @@ def test_generate_header(extension, expected, config):
 def test_generate_header_for_different_end_year(config):
     end_year = date.today().year
     config['end_year'] = end_year
-    data = SUPPORTED_FILES['py']['comments'] | config
+    data = asdict(SUPPORTED_FILE_TYPES['py'].comments) | config
     header = _generate_header(data)
     assert header == dedent(f'''
         # This file is part of Thelema.
@@ -311,7 +312,7 @@ def test_generate_header_for_different_end_year(config):
     '{root}', '{template}', '{substring}'
 ))
 def test_generate_header_for_invalid_placeholder(template, config):
-    data = SUPPORTED_FILES['py']['comments'] | config
+    data = asdict(SUPPORTED_FILE_TYPES['py'].comments) | config
     data['template'] = template
     with pytest.raises(SystemExit) as exc:
         _generate_header(data)
