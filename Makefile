@@ -1,21 +1,24 @@
 # -- linting -------------------------------------------------------------------
 
-.PHONY: lint
-lint:
+.PHONY: ruff
+ruff:
 	ruff check .
 
-# -- testing -------------------------------------------------------------------
-
-.PHONY: headertest
-headertest:
+.PHONY: unbehead
+unbehead:
 	unbehead --check
+
+.PHONY: lint
+lint: ruff unbehead
+
+# -- testing -------------------------------------------------------------------
 
 .PHONY: pytest
 pytest:
 	pytest
 
 .PHONY: test
-test: headertest pytest
+test: pytest
 
 # -- releasing -----------------------------------------------------------------
 
