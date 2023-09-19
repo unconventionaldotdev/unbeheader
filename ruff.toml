@@ -26,3 +26,6 @@ multiline-quotes = "single"
 [isort]
 force-single-line = true
 known-first-party = ["unbeheader"]
+
+[pydocstyle]
+convention = "google"
