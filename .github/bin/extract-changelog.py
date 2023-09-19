@@ -13,12 +13,19 @@ def extract_section(version):
     path = Path(CHANGELOG_FILENAME)
     text = path.read_text()
 
+    # Check that the changelog contains a section for the given version
     re_start = rf'^## ({re.escape(version)})(.*)$'
-    re_end = r'^## (.*)$'
     if not (match := re.search(re_start, text, re.MULTILINE)):
         print(f'::error::Version {version} not found in {CHANGELOG_FILENAME}.')
         sys.exit(1)
 
+    # Check that the given version is not marked as unreleased
+    if 'unreleased' in match.group(2).lower():
+        print(f'::error::Version {version} is marked as unreleased in {CHANGELOG_FILENAME}.')
+        sys.exit(1)
+
+    # Extract the changes for the given version
+    re_end = r'^## (.*)$'
     text = text[match.end(0):]
     if match := re.search(re_end, text, re.MULTILINE):
         text = text[:match.start()]
