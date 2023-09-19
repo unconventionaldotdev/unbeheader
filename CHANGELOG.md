@@ -5,6 +5,7 @@
 - Renamed CLI `--ci` flag to `--check`.
 - Removed Unicode interpuct from CLI output.
 - Removed colors from CLI output when CI envvar is set.
+- Added support for `.pyi` files.
 
 ## v1.1.1
 
