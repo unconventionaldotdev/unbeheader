@@ -10,6 +10,9 @@ on:
       - devel
       - master
 
+env:
+  NO_COLORS: true
+
 jobs:
   setup:
     runs-on: ubuntu-22.04
@@ -47,4 +50,8 @@ jobs:
           poetry install
       - name: Run tests
         run: |
-          poetry run -- make lint
+          echo "::add-matcher::.github/matchers/ruff.json"
+          echo "::add-matcher::.github/matchers/unbehead.json"
+          poetry run -- make lint --keep-going
+          echo "::remove-matcher owner=unbehead::"
+          echo "::remove-matcher owner=ruff::"
