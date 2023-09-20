@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.2 (unreleased)
+## v1.2.0
 
 - Renamed CLI `--ci` flag to `--check`.
 - Removed Unicode interpuct from CLI output.
