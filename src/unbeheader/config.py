@@ -15,6 +15,7 @@ DEFAULT_SUBSTRING = 'This file is part of'
 
 # The name of the files containing header configuration
 CONFIG_FILE_NAME = '.header.yaml'
+CONFIG_FILE_NAME_YML = '.header.yml'
 
 
 def get_config(path: Path, end_year: int) -> ConfigDict:
@@ -30,14 +31,20 @@ def _load_config(path: Path) -> ConfigDict:
     config: ConfigDict = {}
     found = False
     for dir_path in _walk_to_root(path):
-        check_path = dir_path / CONFIG_FILE_NAME
+        check_path_yaml = dir_path / CONFIG_FILE_NAME
+        check_path_yml = dir_path / CONFIG_FILE_NAME_YML
+        if check_path_yaml.exists() and check_path_yml.exists():
+            click.secho(f'Both {CONFIG_FILE_NAME} and {CONFIG_FILE_NAME_YML} files found in {dir_path}',
+                        fg='red', err=True)
+            sys.exit(1)
+        check_path = check_path_yaml or check_path_yml
         if check_path.is_file():
             found = True
             config.update((k, v) for k, v in yaml.safe_load(check_path.read_text()).items() if k not in config)
             if config.pop('root', False):
                 break
     if not found:
-        click.secho(f'No {CONFIG_FILE_NAME} file found', fg='red', err=True)
+        click.secho(f'No valid {CONFIG_FILE_NAME} file found in {path}', fg='red', err=True)
         sys.exit(1)
     return config
 

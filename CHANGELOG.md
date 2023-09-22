@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.0 (unreleased)
+
+- Added support for `.header.yml` config files.
+
 ## v1.2.0
 
 - Renamed CLI `--ci` flag to `--check`.
