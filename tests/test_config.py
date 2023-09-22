@@ -10,6 +10,7 @@ import pytest
 import yaml
 
 from unbeheader.config import CONFIG_FILE_NAME
+from unbeheader.config import CONFIG_FILE_NAME_YML
 from unbeheader.config import DEFAULT_SUBSTRING
 from unbeheader.config import _load_config
 from unbeheader.config import _validate_config
@@ -19,8 +20,8 @@ from unbeheader.config import get_config
 
 @pytest.fixture
 def create_headers_file():
-    def create_headers_file(data, dir_path):
-        file_path = os.path.join(dir_path, CONFIG_FILE_NAME)
+    def create_headers_file(data, dir_path, config_file_name=CONFIG_FILE_NAME):
+        file_path = os.path.join(dir_path, config_file_name)
         with open(file_path, 'w') as yaml_file:
             yaml.dump(data, yaml_file)
 
@@ -78,6 +79,14 @@ def test_load_config_for_stop_on_root(create_headers_file, tmp_path):
     create_headers_file(data_bottom, nested_dir_path)
     config = _load_config(nested_dir_path)
     assert config == {}
+
+
+def test_load_config_for_both_yaml_files(create_headers_file, tmp_path):
+    create_headers_file({}, tmp_path, CONFIG_FILE_NAME)
+    create_headers_file({}, tmp_path, CONFIG_FILE_NAME_YML)
+    with pytest.raises(SystemExit) as exc:
+        _load_config(tmp_path)
+    assert exc.value.code == 1
 
 
 def test_load_config_for_file_not_found(tmp_path):
