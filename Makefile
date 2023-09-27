@@ -15,7 +15,7 @@ unbehead:
 	unbehead --check
 
 .PHONY: lint
-lint: mypy ruff unbehead
+lint: ruff unbehead mypy
 
 # -- testing -------------------------------------------------------------------
 
