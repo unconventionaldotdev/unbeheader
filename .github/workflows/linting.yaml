@@ -3,12 +3,12 @@ name: linting
 on:
   push:
     branches:
-      - devel
       - master
+      - stable
   pull_request:
     branches:
-      - devel
       - master
+      - stable
 
 jobs:
   setup:
