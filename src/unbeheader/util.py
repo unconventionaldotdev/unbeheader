@@ -1,6 +1,8 @@
 # This file is part of Unbeheader.
 # Copyright (C) CERN & UNCONVENTIONAL
 
+from __future__ import annotations
+
 import re
 from pathlib import Path
 from re import Match

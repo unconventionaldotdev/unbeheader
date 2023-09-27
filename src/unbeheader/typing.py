@@ -6,10 +6,10 @@ from pathlib import Path
 from re import Pattern
 from typing import Any
 from typing import NamedTuple
-from typing import TypeAlias
 
-ConfigDict: TypeAlias = dict[str, Any]
-PathCache: TypeAlias = dict[Path, bool]
+# TODO: Use explicit TypeAlias when Python 3.9 is dropped
+ConfigDict = dict[str, Any]
+PathCache = dict[Path, bool]
 
 
 @dataclass
