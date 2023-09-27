@@ -1,6 +1,7 @@
 [virtualenvs]
 create = true
 in-project = true
+prefer-active-python = true
 
 [tool.poetry]
 name = "unbeheader"
@@ -37,6 +38,7 @@ click = ">=8"
 mypy = "^1.5.1"
 pytest = "^7.4.0"
 ruff = "^0.0.280"
+tox = "^4.11.3"
 types-pyyaml = "^6.0.12.11"
 
 [build-system]

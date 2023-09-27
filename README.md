@@ -131,7 +131,7 @@ git clone https://github.com/unconventionaldotdev/unbeheader
 cd unbeheader
 ```
 
-Before creating the virtualenv, you probably want to be using the same version of Python that the development of the project is targeting. This is the version specified in the `.python-version` file and you can install it with `pyenv`:
+Before creating the virtualenv, you probably want to be using the same version of Python that the development of the project is targeting. This is the first version specified in the `.python-version` file and you can install it with `pyenv`:
 
 ```sh
 pyenv install
@@ -160,14 +160,20 @@ unbehead
 
 This project uses GitHub Actions to run the tests and linter on every pull request to the `master` and `devel` branches. You are still encouraged to run the tests and linter locally before pushing your changes.
 
+Linter checks can be run with:
+
+```sh
+poetry run -- make lint
+```
+
 Tests can be run with:
 
 ```sh
 poetry run -- make test
 ```
 
-Linter can be run with:
+Tests can be run against all supported Python versions with:
 
 ```sh
-poetry run -- make lint
+tox
 ```

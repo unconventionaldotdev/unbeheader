@@ -13,6 +13,10 @@ on:
 jobs:
   setup:
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
     steps:
       - uses: actions/checkout@v3
       - name: Install poetry
@@ -23,6 +27,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         uses: actions/setup-python@v4
         with:
+          python-version: ${{ matrix.python-version }}
           cache: 'poetry'
       - name: Install dependencies
         if: steps.python.outputs.cache-hit != 'true'
@@ -32,6 +37,10 @@ jobs:
   test:
     needs: setup
     runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
     steps:
       - uses: actions/checkout@v3
       - name: Install poetry
@@ -41,6 +50,7 @@ jobs:
         id: python
         uses: actions/setup-python@v4
         with:
+          python-version: ${{ matrix.python-version }}
           cache: 'poetry'
       - name: Install package
         run: |
