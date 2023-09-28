@@ -11,29 +11,7 @@ on:
       - stable
 
 jobs:
-  setup:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install poetry
-        run: |
-          pipx install poetry
-      - name: Set up Python
-        id: python
-        if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/setup-python@v4
-        with:
-          # TODO: Remove explicit Python version once bug with .python-version file is solved
-          #       https://github.com/actions/setup-python/issues/734
-          python-version: '3.11'
-          cache: 'poetry'
-      - name: Install dependencies
-        if: steps.python.outputs.cache-hit != 'true'
-        run: |
-          poetry install --no-root
-
   lint:
-    needs: setup
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -48,7 +26,7 @@ jobs:
           #       https://github.com/actions/setup-python/issues/734
           python-version: '3.11'
           cache: 'poetry'
-      - name: Install dependencies
+      - name: Install package
         run: |
           poetry install
       - name: Run tests
