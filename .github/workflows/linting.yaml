@@ -19,7 +19,6 @@ jobs:
         run: |
           pipx install poetry
       - name: Set up Python
-        id: python
         uses: actions/setup-python@v4
         with:
           # TODO: Remove explicit Python version once bug with .python-version file is solved
