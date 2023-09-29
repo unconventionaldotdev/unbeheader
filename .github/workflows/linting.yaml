@@ -27,6 +27,7 @@ jobs:
           python-version: '3.11'
           cache: 'poetry'
       - name: Install package
+        if: steps.python.outputs.cache-hit != 'true'
         run: |
           poetry install
       - name: Run tests
