@@ -158,7 +158,7 @@ unbehead
 
 ### Contributing
 
-This project uses GitHub Actions to run the tests and linter on every pull request to the `master` and `devel` branches. You are still encouraged to run the tests and linter locally before pushing your changes.
+This project uses GitHub Actions to run the tests and linter on every pull request to the `master` and `stable` branches. You are still encouraged to run the tests and linter locally before pushing your changes.
 
 Linter checks can be run with:
 
