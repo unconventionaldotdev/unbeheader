@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.3.0 (unreleased)
+## v1.3.0
 
 - Added support for `.header.yml` config files.
 - Fixed compatibility with Python 3.9.
