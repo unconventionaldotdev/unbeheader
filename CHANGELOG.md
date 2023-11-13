@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.4.0 (unreleased)
+
+- *Nothing for now.*
+
 ## v1.3.0
 
 - Added support for `.header.yml` config files.
