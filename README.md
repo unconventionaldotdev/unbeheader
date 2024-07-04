@@ -2,7 +2,7 @@
 
 > Never fail to maintain your file headers.
 
-Unbeheader is a CLI tool to keep file headers up-to-date and to check that they remain so. The Unbeheader allows you to define file header templates in `.header.yaml` configuration files and then apply them to all the files in the project. Unbeheader knows how to update headers in [different file types](https://github.com/unconventionaldotdev/unbeheader/blob/master/unbeheader/__init__.py), including Python, JavaScript and CSS files.
+Unbeheader is a CLI tool to keep file headers up-to-date and to check that they remain so. The Unbeheader allows you to define file header templates in `.header.yaml` configuration files and then apply them to all the files in the project. Unbeheader knows how to update headers in [different file types](https://github.com/unconventionaldotdev/unbeheader/blob/master/src/unbeheader/__init__.py), including Python, JavaScript and CSS files.
 
 A header template will be rendered like this in Python files:
 
