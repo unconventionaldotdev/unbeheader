@@ -2,7 +2,7 @@
 
 ## v1.4.0 (unreleased)
 
-- *Nothing for now.*
+- Added support for TypeScript (TS + TSX) files.
 
 ## v1.3.0
 
