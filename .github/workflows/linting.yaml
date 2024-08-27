@@ -23,7 +23,7 @@ jobs:
         with:
           # TODO: Remove explicit Python version once bug with .python-version file is solved
           #       https://github.com/actions/setup-python/issues/734
-          python-version: '3.11'
+          python-version: '3.12'
           cache: 'poetry'
       - name: Install package
         run: |
