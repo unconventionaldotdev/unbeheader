@@ -19,7 +19,13 @@ SUPPORTED_FILE_TYPES: dict[str, SupportedFileType] = {
     'js': SupportedFileType(
         re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
         CommentSkeleton('//', '//')),
+    'ts': SupportedFileType(
+        re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
+        CommentSkeleton('//', '//')),
     'jsx': SupportedFileType(
+        re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
+        CommentSkeleton('//', '//')),
+    'tsx': SupportedFileType(
         re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
         CommentSkeleton('//', '//')),
     'css': SupportedFileType(
