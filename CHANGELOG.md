@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.4.0 (unreleased)
+## v1.4.0
 
 - Added support for TypeScript (TS + TSX) files.
 
