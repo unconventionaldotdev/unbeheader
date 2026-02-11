@@ -25,8 +25,8 @@ def cformat(string: str) -> Color:
         if m.group('fg_bold'):
             bold = '{b}'
         if bg_color := m.group('bg'):
-            bg = '{bg%s}' % bg_color.replace('grey', 'white')
-        fg = '{%s}' % m.group('fg').replace('grey', 'white')
+            bg = f'{{bg{bg_color.replace("grey", "white")}}}'
+        fg = f'{{{m.group("fg").replace("grey", "white")}}}'
         return Color(f'{bold}{bg}{fg}')
 
     reset = Color('{/all}')

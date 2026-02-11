@@ -121,8 +121,7 @@ In order to develop Unbeheader, you will need to install the project and its dep
 
 - [`git`](https://git-scm.com/) (available in most systems)
 - [`make`](https://www.gnu.org/software/make/) (available in most systems)
-- [`poetry`](https://python-poetry.org/) ([installation guide](https://python-poetry.org/docs/#installation))
-- [`pyenv`](https://github.com/pyenv/pyenv) ([installation guide](https://github.com/pyenv/pyenv#installation))
+- [`uv`](https://docs.astral.sh/uv/) ([installation guide](https://docs.astral.sh/uv/getting-started/installation/))
 
 First, clone [the repository](https://github.com/unconventionaldotdev/unbeheader) locally with:
 
@@ -131,29 +130,24 @@ git clone https://github.com/unconventionaldotdev/unbeheader
 cd unbeheader
 ```
 
-Before creating the virtualenv, you probably want to be using the same version of Python that the development of the project is targeting. This is the first version specified in the `.python-version` file and you can install it with `pyenv`:
+Make sure to have the right versions of `python`:
 
 ```sh
-pyenv install
+uv python install  # reads from .python-version
 ```
 
-You may now create the virtualenv and install the project with its dependencies in it with `poetry`:
+Install the project with its dependencies:
 
 ```sh
-poetry install
+uv sync --extra dev
 ```
+
+The `dev` extra contains the tooling needed for linting, typing, and tests; omit `--extra dev` if you only need the runtime CLI.
 
 Once installed, you can invoke the `unbehead` command with:
 
 ```sh
-poetry run -- unbehead
-```
-
-For convenience, you may want to spawn a shell within the virtualenv with:
-
-```sh
-poetry shell
-unbehead
+uv run unbehead
 ```
 
 ### Contributing
@@ -163,17 +157,17 @@ This project uses GitHub Actions to run the tests and linter on every pull reque
 Linter checks can be run with:
 
 ```sh
-poetry run -- make lint
+uv run make lint
 ```
 
 Tests can be run with:
 
 ```sh
-poetry run -- make test
+uv run make test
 ```
 
 Tests can be run against all supported Python versions with:
 
 ```sh
-tox
+uv run tox
 ```

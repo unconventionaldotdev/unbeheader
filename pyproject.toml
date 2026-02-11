@@ -1,47 +1,57 @@
-[virtualenvs]
-create = true
-in-project = true
-prefer-active-python = true
-
-[tool.poetry]
+[project]
 name = "unbeheader"
 version = "1.5.0-dev"
 description = "Never fail to maintain your file headers"
-repository = "https://github.com/unconventionaldotdev/unbeheader"
 readme = "README.md"
-license = "MIT"
+license = { text = "MIT" }
+requires-python = ">=3.9"
 authors = [
-  "Adrian Moennich <adrian.moennich@cern.ch>",
-  "Alejandro Avilés <ome@unconventional.dev>"
+  { name = "Adrian Moennich", email = "adrian.moennich@cern.ch" },
+  { name = "Alejandro Avilés", email = "ome@unconventional.dev" }
 ]
 maintainers = [
-  "Alejandro Avilés <ome@unconventional.dev>",
-  "Adrian Moennich <adrian.moennich@cern.ch>"
+  { name = "Alejandro Avilés", email = "ome@unconventional.dev" },
+  { name = "Adrian Moennich", email = "adrian.moennich@cern.ch" }
 ]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Topic :: Software Development",
-    "Topic :: Software Development :: Quality Assurance",
-    "Topic :: Software Development :: Testing",
+  "Development Status :: 5 - Production/Stable",
+  "Topic :: Software Development",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Testing",
+]
+dependencies = [
+  "colorclass>=2.2.2",
+  "pyyaml>=6",
+  "click>=8",
 ]
 
-[tool.poetry.scripts]
+[dependency-groups]
+dev = [
+  "mypy>=1.5.1",
+  "pytest>=7.4.0",
+  "ruff>=0.0.280",
+  "tox>=4.11.3",
+  "types-pyyaml>=6.0.12.11",
+  "pytest-cov>=4.1.0",
+]
+
+[project.scripts]
 unbehead = "unbeheader.cli:main"
 
-[tool.poetry.dependencies]
-python = ">=3.9.0"
-colorclass = ">=2.2.2"
-pyyaml = ">=6"
-click = ">=8"
+[project.urls]
+Repository = "https://github.com/unconventionaldotdev/unbeheader"
 
-[tool.poetry.group.dev.dependencies]
-mypy = "^1.5.1"
-pytest = "^7.4.0"
-ruff = "^0.0.280"
-tox = "^4.11.3"
-types-pyyaml = "^6.0.12.11"
-pytest-cov = "^4.1.0"
+[tool.hatch.build.targets.wheel]
+packages = ["src/unbeheader"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/unbeheader",
+  "README.md",
+  "LICENSE",
+  "CHANGELOG.md",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"

@@ -19,12 +19,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - name: Install poetry
-        run: |
-          pipx install poetry
+      - uses: astral-sh/setup-uv@v1
       - name: Build package
         run: |
-          poetry build
+          uv build
       - name: Extract changelog
         run: |
           .github/bin/extract-changelog.py ${{ github.ref_name }} /tmp/changelog.md

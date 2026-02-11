@@ -15,19 +15,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - name: Install poetry
-        run: |
-          pipx install poetry
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          # TODO: Remove explicit Python version once bug with .python-version file is solved
-          #       https://github.com/actions/setup-python/issues/734
-          python-version: '3.12'
-          cache: 'poetry'
+      - uses: astral-sh/setup-uv@v7
       - name: Install package
         run: |
-          poetry install
+          make install
       - name: Run tests
         env:
           NO_COLORS: true  # Disable colors in ruff output
@@ -35,7 +26,7 @@ jobs:
           echo "::add-matcher::.github/matchers/mypy.json"
           echo "::add-matcher::.github/matchers/ruff.json"
           echo "::add-matcher::.github/matchers/unbehead.json"
-          poetry run -- make lint --keep-going
+          uv run -- make lint --keep-going
           echo "::remove-matcher owner=unbehead::"
           echo "::remove-matcher owner=ruff::"
           echo "::remove-matcher owner=mypy::"

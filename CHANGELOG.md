@@ -2,7 +2,7 @@
 
 ## v1.5.0 (unreleased)
 
-- *Nothing for now.*
+- Switched project packaging and workflows from Poetry to uv.
 
 ## v1.4.0
 

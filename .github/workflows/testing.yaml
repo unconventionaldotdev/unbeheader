@@ -17,19 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12']
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v3
-      - name: Install poetry
-        run: |
-          pipx install poetry
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'poetry'
+      - uses: astral-sh/setup-uv@v7
       - name: Install package
         run: |
-          poetry install
+          make install
       - name: Run tests
         run: |
-          poetry run -- make test
+          uv run -- make test
