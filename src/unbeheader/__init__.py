@@ -19,6 +19,9 @@ SUPPORTED_FILE_TYPES: dict[str, SupportedFileType] = {
     'js': SupportedFileType(
         re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
         CommentSkeleton('//', '//')),
+    'mjs': SupportedFileType(
+        re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
+        CommentSkeleton('//', '//')),
     'ts': SupportedFileType(
         re.compile(r'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
         CommentSkeleton('//', '//')),
