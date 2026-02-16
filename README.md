@@ -139,10 +139,8 @@ uv python install  # reads from .python-version
 Install the project with its dependencies:
 
 ```sh
-uv sync --extra dev
+uv sync
 ```
-
-The `dev` extra contains the tooling needed for linting, typing, and tests; omit `--extra dev` if you only need the runtime CLI.
 
 Once installed, you can invoke the `unbehead` command with:
 

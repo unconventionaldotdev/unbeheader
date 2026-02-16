@@ -4,7 +4,7 @@ version = "1.5.0-dev"
 description = "Never fail to maintain your file headers"
 readme = "README.md"
 license = { text = "MIT" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
   { name = "Adrian Moennich", email = "adrian.moennich@cern.ch" },
   { name = "Alejandro Avilés", email = "ome@unconventional.dev" }

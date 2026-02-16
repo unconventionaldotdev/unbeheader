@@ -4,6 +4,7 @@
 
 - Switched project packaging and workflows from Poetry to uv.
 - Added support for `.mjs` files.
+- Dropped support for end-of-life Python 3.9.
 
 ## v1.4.0
 
