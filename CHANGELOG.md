@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.0 (unreleased)
+
+- *Nothing for now.*
+
 ## v1.5.0
 
 - Switched project packaging and workflows from Poetry to uv.
