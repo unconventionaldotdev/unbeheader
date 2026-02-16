@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.5.0 (unreleased)
+## v1.5.0
 
 - Switched project packaging and workflows from Poetry to uv.
 - Added support for `.mjs` files.

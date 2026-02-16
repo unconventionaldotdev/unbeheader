@@ -1,6 +1,6 @@
 [project]
 name = "unbeheader"
-version = "1.5.0-dev"
+version = "1.5.0"
 description = "Never fail to maintain your file headers"
 readme = "README.md"
 license = { text = "MIT" }
